@@ -1,4 +1,4 @@
-const CACHE = 'hypercoach-v1';
+const CACHE = 'hypercoach-v2';
 const ASSETS = [
   '/',
   '/index.html',
