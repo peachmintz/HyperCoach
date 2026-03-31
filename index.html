@@ -640,9 +640,9 @@ function sw(name,el){
 function renderGoalBar(){document.getElementById('goalBar').innerHTML=Object.entries(GOAL_CFG).map(([k,v])=>`<span class="pill ${DB.goal===k?'on':''}" onclick="setGoal('${k}')">${v.label}</span>`).join('');document.getElementById('goalBadge').textContent=GOAL_CFG[DB.goal].label;}
 function setGoal(g){DB.goal=g;saveDB();renderGoalBar();renderDash();toast(GOAL_CFG[g].label+' mode active');}
 
-function buildTplList(){document.getElementById('tplList').innerHTML=TEMPLATES.map((t,i)=>`<div class="card" style="cursor:pointer" id="tc${i}" onclick="selTpl(${i})"><div class="card-row"><span class="card-title">${t.name}</span><span class="badge bb">${t.exercises.length} ex</span></div><div class="card-sub">${t.muscles.join(' · ')}</div></div>`).join('');}
+function buildTplList(){document.getElementById('tplList').innerHTML=TEMPLATES.map((t,i)=>`<div class="card" style="cursor:pointer" id="tc${i}" onclick="pickTpl(${i})"><div class="card-row"><span class="card-title">${t.name}</span><span class="badge bb">${t.exercises.length} ex</span></div><div class="card-sub">${t.muscles.join(' · ')}</div></div>`).join('');}
 
-function selTpl(idx){
+function pickTpl(idx){
   selTpl=idx;coachTplIdx=idx;coachExIdx=0;coachSetIdx=0;
   document.querySelectorAll('[id^="tc"]').forEach((c,i)=>{c.style.border=i===idx?'1.5px solid var(--mid)':'0.5px solid var(--border2)';c.style.background=i===idx?'var(--powder-xlt)':'var(--surface)';});
   const t=TEMPLATES[idx],gc=GOAL_CFG[DB.goal],prev=prevSess(t.id);
