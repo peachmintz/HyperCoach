@@ -1,7 +1,7 @@
-const CACHE = 'hypercoach-v2';
+const CACHE = 'hypercoach-v3';
 const ASSETS = [
-  '/',
-  '/index.html',
+  '/HyperCoach/',
+  '/HyperCoach/index.html',
   'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js'
 ];
 
@@ -30,7 +30,7 @@ self.addEventListener('fetch', e => {
         const clone = response.clone();
         caches.open(CACHE).then(c => c.put(e.request, clone));
         return response;
-      }).catch(() => caches.match('/index.html'));
+      }).catch(() => caches.match('/HyperCoach/index.html'));
     })
   );
 });
