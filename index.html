@@ -350,6 +350,7 @@ input[type=number]{-moz-appearance:textfield}
 <div class="tabbar">
   <div class="tab on" data-t="dash" onclick="sw('dash',this)">Home</div>
   <div class="tab" data-t="log" onclick="sw('log',this)">Log</div>
+  <div class="tab" data-t="templates" onclick="sw('templates',this)">Templates</div>
   <div class="tab" data-t="coach" onclick="sw('coach',this)">Coach</div>
   <div class="tab" data-t="history" onclick="sw('history',this)">History</div>
   <div class="tab" data-t="progress" onclick="sw('progress',this)">Progress</div>
@@ -380,6 +381,43 @@ input[type=number]{-moz-appearance:textfield}
       <button class="btn sm sec" onclick="toast('Full intensity — let\'s go!')">Fresh</button>
       <button class="btn sm sec" onclick="toast('Moderate session recommended.')">A bit sore</button>
       <button class="btn sm sec" onclick="toast('Rest day — recovery is training too.')">Very sore</button>
+    </div>
+  </div>
+</div>
+
+<!-- TEMPLATES -->
+<div class="sec" id="tab-templates">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div class="sec-lbl" style="margin-bottom:0">My templates</div>
+    <button class="btn sm brand" onclick="openTplBuilder(null)" style="touch-action:manipulation">+ New</button>
+  </div>
+  <div id="customTplList"></div>
+  <div class="sec-lbl" style="margin-top:16px">Built-in templates</div>
+  <div id="builtinTplList"></div>
+  <div id="tplBuilder" style="display:none">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <button class="btn sm sec" onclick="closeTplBuilder()" style="margin:0;touch-action:manipulation">← Back</button>
+      <div style="font-size:16px;font-weight:600;color:var(--navy)" id="tplBuilderTitle">New template</div>
+    </div>
+    <div class="card">
+      <div class="inp-lbl">Template name</div>
+      <input class="inp" id="tplName" placeholder="e.g. Push Day A" style="margin-bottom:14px">
+      <div class="sec-lbl" style="margin-bottom:8px">Exercises</div>
+      <div id="tplExList"></div>
+      <button class="btn sec" onclick="openExPicker()" style="margin-top:10px;touch-action:manipulation">+ Add exercise</button>
+    </div>
+    <button class="btn pri" onclick="saveTpl()" style="touch-action:manipulation">Save template</button>
+  </div>
+  <div id="exPickerOverlay" style="display:none;position:fixed;inset:0;background:rgba(1,31,75,0.5);z-index:200;padding:20px" onclick="closeExPickerIfBg(event)">
+    <div style="background:var(--surface);border-radius:var(--r12);max-height:80vh;display:flex;flex-direction:column;overflow:hidden;margin-top:40px">
+      <div style="padding:16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:15px;font-weight:600;color:var(--navy)">Add exercise</div>
+        <button class="btn sm sec" onclick="closeExPicker()" style="margin:0;touch-action:manipulation">Done</button>
+      </div>
+      <div style="padding:12px 16px;border-bottom:0.5px solid var(--border)">
+        <input class="inp" id="exPickerSearch" placeholder="Search exercises..." oninput="renderExPicker()" style="border-radius:var(--rpill)">
+      </div>
+      <div style="overflow-y:auto;padding:0 16px" id="exPickerList"></div>
     </div>
   </div>
 </div>
@@ -606,13 +644,13 @@ const TEMPLATES=[
   {id:'legs-a',name:'Legs A — Quads & Glutes',muscles:['Quads','Glutes','Hamstrings'],compound:'Squat (barbell)',exercises:[{name:'Squat (barbell)',sets:4,reps:6,kg:115},{name:'Romanian deadlift',sets:3,reps:10,kg:87},{name:'Leg press',sets:3,reps:12,kg:135},{name:'Bulgarian split squat',sets:3,reps:10,kg:22},{name:'Leg curl (machine)',sets:3,reps:12,kg:45}]},
   {id:'upper-a',name:'Upper A — Full upper body',muscles:['Chest','Back','Shoulders'],compound:'Bench press',exercises:[{name:'Bench press',sets:4,reps:5,kg:92},{name:'Barbell row',sets:4,reps:6,kg:80},{name:'OHP (barbell)',sets:3,reps:8,kg:60},{name:'Pull-up (weighted)',sets:3,reps:6,kg:10},{name:'Incline DB press',sets:3,reps:10,kg:28},{name:'Lateral raise',sets:3,reps:15,kg:12}]}
 ];
-let DB={sessions:[],split:'PPL',streak:0,lastDate:null,goal:'hypertrophy',profile:{level:'intermediate',days:4,equipment:'full'},exercises:[...DEF_EX],measurements:[]};
+let DB={sessions:[],split:'PPL',streak:0,lastDate:null,goal:'hypertrophy',profile:{level:'intermediate',days:4,equipment:'full'},exercises:[...DEF_EX],measurements:[],customTemplates:[]};
 let obA=[0,0,0,0],selTpl=null,coachTplIdx=null,coachExIdx=0,coachSetIdx=0;
 let tInt=null,tRem=0,tTot=0,tRun=false;
 let ctInt=null,ctRem=0,ctTot=0,ctRun=false;
 let activeMF='',volCI=null,bodyCI=null;
 
-function loadDB(){try{const r=localStorage.getItem('hc_v5');if(r){DB=JSON.parse(r);if(!DB.exercises)DB.exercises=[...DEF_EX];if(!DB.measurements)DB.measurements=[];}}catch(e){}}
+function loadDB(){try{const r=localStorage.getItem('hc_v5');if(r){DB=JSON.parse(r);if(!DB.exercises)DB.exercises=[...DEF_EX];if(!DB.measurements)DB.measurements=[];if(!DB.customTemplates)DB.customTemplates=[];}}catch(e){}}
 function saveDB(){try{localStorage.setItem('hc_v5',JSON.stringify(DB));}catch(e){}}
 function clearAll(){DB={sessions:[],split:'PPL',streak:0,lastDate:null,goal:'hypertrophy',profile:DB.profile,exercises:[...DEF_EX],measurements:[]};saveDB();renderDash();renderProgress();renderHistory();renderMeasHist();toast('All data cleared');}
 
@@ -635,17 +673,19 @@ function sw(name,el){
   if(name==='body'){renderMeasHist();renderBodyChart();}
   if(name==='settings')renderSettings();
   if(name==='coach')renderCoach();
+  if(name==='templates')renderTemplatesTab();
 }
 
 function renderGoalBar(){document.getElementById('goalBar').innerHTML=Object.entries(GOAL_CFG).map(([k,v])=>`<span class="pill ${DB.goal===k?'on':''}" onclick="setGoal('${k}')">${v.label}</span>`).join('');document.getElementById('goalBadge').textContent=GOAL_CFG[DB.goal].label;}
 function setGoal(g){DB.goal=g;saveDB();renderGoalBar();renderDash();toast(GOAL_CFG[g].label+' mode active');}
 
-function buildTplList(){document.getElementById('tplList').innerHTML=TEMPLATES.map((t,i)=>`<div class="card" style="cursor:pointer" id="tc${i}" onclick="pickTpl(${i})"><div class="card-row"><span class="card-title">${t.name}</span><span class="badge bb">${t.exercises.length} ex</span></div><div class="card-sub">${t.muscles.join(' · ')}</div></div>`).join('');}
+function allTemplates(){return [...DB.customTemplates,...TEMPLATES];}
+function buildTplList(){const all=allTemplates();document.getElementById('tplList').innerHTML=all.map((t,i)=>{const isCustom=i<DB.customTemplates.length;return `<div class="card" style="cursor:pointer" id="tc${i}" onclick="pickTpl(${i})"><div class="card-row"><span class="card-title">${t.name}</span><div style="display:flex;align-items:center;gap:6px">${isCustom?`<span class="badge bb" style="cursor:pointer" onclick="event.stopPropagation();openTplBuilder(${i})">Edit</span>`:''}<span class="badge bn">${t.exercises.length} ex</span></div></div><div class="card-sub">${t.muscles?t.muscles.join(' · '):t.exercises.map(e=>e.name).slice(0,3).join(', ')+(t.exercises.length>3?'…':'')}</div></div>`;}).join('');}
 
 function pickTpl(idx){
   selTpl=idx;coachTplIdx=idx;coachExIdx=0;coachSetIdx=0;
   document.querySelectorAll('[id^="tc"]').forEach((c,i)=>{c.style.border=i===idx?'1.5px solid var(--mid)':'0.5px solid var(--border2)';c.style.background=i===idx?'var(--powder-xlt)':'var(--surface)';});
-  const t=TEMPLATES[idx],gc=GOAL_CFG[DB.goal],prev=prevSess(t.id);
+  const t=allTemplates()[idx],gc=GOAL_CFG[DB.goal],prev=prevSess(t.id||t.name);
   document.getElementById('logTitle').textContent=t.name;
   document.getElementById('lastSess').textContent=prev?'Last logged '+daysSince(prev.date)+' days ago':'First time — focus on form';
   renderWarmup(t,prev);
@@ -663,11 +703,11 @@ function nextKg(p){if(p.rir===0)return p.kg+2.5;if(p.rir>=3)return Math.max(p.kg
 function prevSess(id){const m=DB.sessions.filter(s=>s.id===id);return m.length?m[m.length-1]:null;}
 function daysSince(iso){return Math.max(0,Math.floor((Date.now()-new Date(iso).getTime())/86400000));}
 
-function saveSession(){if(selTpl===null){toast('Select a template first');return;}const t=TEMPLATES[selTpl];const exercises=t.exercises.map((ex,i)=>({name:ex.name,sets:parseInt(document.getElementById('s'+i).value)||ex.sets,reps:parseInt(document.getElementById('r'+i).value)||ex.reps,kg:parseFloat(document.getElementById('k'+i).value)||ex.kg,rir:parseInt(document.getElementById('rir'+i).value)}));DB.sessions.push({id:t.id,name:t.name,date:new Date().toISOString(),goal:DB.goal,exercises});updateStreak();saveDB();toast('Session saved — great work!');document.getElementById('logPanel').style.display='none';document.querySelectorAll('[id^="tc"]').forEach(c=>{c.style.border='0.5px solid var(--border2)';c.style.background='var(--surface)';});selTpl=null;coachTplIdx=null;stopTimer();renderDash();}
+function saveSession(){if(selTpl===null){toast('Select a template first');return;}const t=allTemplates()[selTpl];const exercises=t.exercises.map((ex,i)=>({name:ex.name,sets:parseInt(document.getElementById('s'+i).value)||ex.sets,reps:parseInt(document.getElementById('r'+i).value)||ex.reps,kg:parseFloat(document.getElementById('k'+i).value)||ex.kg,rir:parseInt(document.getElementById('rir'+i).value)}));DB.sessions.push({id:t.id||t.name,name:t.name,date:new Date().toISOString(),goal:DB.goal,exercises});updateStreak();saveDB();toast('Session saved — great work!');document.getElementById('logPanel').style.display='none';document.querySelectorAll('[id^="tc"]').forEach(c=>{c.style.border='0.5px solid var(--border2)';c.style.background='var(--surface)';});selTpl=null;coachTplIdx=null;stopTimer();renderDash();}
 function updateStreak(){const today=new Date().toDateString();if(DB.lastDate===today)return;DB.streak=(DB.lastDate===new Date(Date.now()-86400000).toDateString())?(DB.streak||0)+1:1;DB.lastDate=today;}
 
-function renderCoach(){if(coachTplIdx===null){document.getElementById('coachEmpty').style.display='block';document.getElementById('coachActive').style.display='none';return;}document.getElementById('coachEmpty').style.display='none';document.getElementById('coachActive').style.display='block';const t=TEMPLATES[coachTplIdx];document.getElementById('coachSessName').textContent=t.name+' — '+GOAL_CFG[DB.goal].label;document.getElementById('coachProgTxt').textContent='Exercise '+(coachExIdx+1)+' of '+t.exercises.length;document.getElementById('coachNav').innerHTML=t.exercises.map((ex,i)=>`<span class="badge ${i===coachExIdx?'bb':'bn'}" style="cursor:pointer;opacity:${i===coachExIdx?1:.65}" onclick="jumpEx(${i})">${i+1}</span>`).join('');renderCoachEx();}
-function renderCoachEx(){const t=TEMPLATES[coachTplIdx],ex=t.exercises[coachExIdx],prev=prevSess(t.id),p=prev?prev.exercises[coachExIdx]:null,kg=p?nextKg(p):ex.kg;document.getElementById('coachExName').textContent=ex.name;document.getElementById('coachExSub').textContent=ex.sets+' sets · '+ex.reps+' reps · '+kg.toFixed(1)+' kg';document.getElementById('coachSets').innerHTML=Array.from({length:ex.sets},(_,i)=>`<div class="set-row" id="csr${i}"><div class="set-num ${i===coachSetIdx?'active':i<coachSetIdx?'done':''}">${i<coachSetIdx?'✓':(i+1)}</div><div class="set-info"><div class="set-detail">${kg.toFixed(1)} kg × ${ex.reps} reps</div><div class="set-sub">RIR target: ${i===ex.sets-1?'0–1':'1–2'}</div></div><div class="set-tag">${i===coachSetIdx?'→ now':i<coachSetIdx?'done':''}</div></div>`).join('');document.getElementById('coachSets').onclick=e=>{const row=e.target.closest('.set-row');if(!row)return;const i=parseInt(row.id.replace('csr',''));if(i===coachSetIdx){coachSetIdx++;if(coachSetIdx>=ex.sets)coachSetIdx=0;renderCoachEx();startCTimer(GOAL_CFG[DB.goal].rest);}};}
+function renderCoach(){if(coachTplIdx===null){document.getElementById('coachEmpty').style.display='block';document.getElementById('coachActive').style.display='none';return;}document.getElementById('coachEmpty').style.display='none';document.getElementById('coachActive').style.display='block';const t=allTemplates()[coachTplIdx];document.getElementById('coachSessName').textContent=t.name+' — '+GOAL_CFG[DB.goal].label;document.getElementById('coachProgTxt').textContent='Exercise '+(coachExIdx+1)+' of '+t.exercises.length;document.getElementById('coachNav').innerHTML=t.exercises.map((ex,i)=>`<span class="badge ${i===coachExIdx?'bb':'bn'}" style="cursor:pointer;opacity:${i===coachExIdx?1:.65}" onclick="jumpEx(${i})">${i+1}</span>`).join('');renderCoachEx();}
+function renderCoachEx(){const t=allTemplates()[coachTplIdx],ex=t.exercises[coachExIdx],prev=prevSess(t.id||t.name),p=prev?prev.exercises[coachExIdx]:null,kg=p?nextKg(p):ex.kg;document.getElementById('coachExName').textContent=ex.name;document.getElementById('coachExSub').textContent=ex.sets+' sets · '+ex.reps+' reps · '+kg.toFixed(1)+' kg';document.getElementById('coachSets').innerHTML=Array.from({length:ex.sets},(_,i)=>`<div class="set-row" id="csr${i}"><div class="set-num ${i===coachSetIdx?'active':i<coachSetIdx?'done':''}">${i<coachSetIdx?'✓':(i+1)}</div><div class="set-info"><div class="set-detail">${kg.toFixed(1)} kg × ${ex.reps} reps</div><div class="set-sub">RIR target: ${i===ex.sets-1?'0–1':'1–2'}</div></div><div class="set-tag">${i===coachSetIdx?'→ now':i<coachSetIdx?'done':''}</div></div>`).join('');document.getElementById('coachSets').onclick=e=>{const row=e.target.closest('.set-row');if(!row)return;const i=parseInt(row.id.replace('csr',''));if(i===coachSetIdx){coachSetIdx++;if(coachSetIdx>=ex.sets)coachSetIdx=0;renderCoachEx();startCTimer(GOAL_CFG[DB.goal].rest);}};}
 function jumpEx(i){coachExIdx=i;coachSetIdx=0;renderCoach();}
 function coachNext(){if(coachExIdx<TEMPLATES[coachTplIdx].exercises.length-1){coachExIdx++;coachSetIdx=0;renderCoach();}else toast('Last exercise — tap Finish to save!');}
 function coachPrev(){if(coachExIdx>0){coachExIdx--;coachSetIdx=0;renderCoach();}}
@@ -715,7 +755,22 @@ function updSet(key,val){DB.profile[key]=val;saveDB();renderSettings();toast('Se
 let toastT;
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),2600);}
 
-function initApp(){buildTplList();renderDash();renderSettings();}
+
+let tplEditIdx=null,tplBuilderExs=[];
+function renderTemplatesTab(){const ct=DB.customTemplates;document.getElementById('customTplList').innerHTML=ct.length?ct.map((t,i)=>'<div class="card" style="cursor:pointer" onclick="openTplBuilder('+i+')"><div class="card-row"><span class="card-title">'+t.name+'</span><div style="display:flex;gap:6px;align-items:center"><span class="badge bb">'+t.exercises.length+' ex</span><button class="btn sm danger-btn" style="padding:5px 10px;font-size:11px;margin:0" onclick="event.stopPropagation();deleteTpl('+i+')">Delete</button></div></div><div class="card-sub">'+t.exercises.map(e=>e.name).slice(0,3).join(', ')+(t.exercises.length>3?'…':'')+'</div></div>').join(''):'<div style="padding:14px 0;font-size:13px;color:var(--ink3)">No custom templates yet — tap + New to create one.</div>';document.getElementById('builtinTplList').innerHTML=TEMPLATES.map(t=>'<div class="card"><div class="card-row"><span class="card-title">'+t.name+'</span><span class="badge bn">'+t.exercises.length+' ex</span></div><div class="card-sub">'+t.muscles.join(' · ')+'</div></div>').join('');document.getElementById('tplBuilder').style.display='none';['customTplList','builtinTplList'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});document.querySelectorAll('#tab-templates .sec-lbl').forEach(el=>el.style.display='');var hdr=document.querySelector('#tab-templates>div:first-child');if(hdr)hdr.style.display='';}
+function openTplBuilder(idx){tplEditIdx=idx;tplBuilderExs=idx!==null?JSON.parse(JSON.stringify(DB.customTemplates[idx].exercises)):[];document.getElementById('tplName').value=idx!==null?DB.customTemplates[idx].name:'';document.getElementById('tplBuilderTitle').textContent=idx!==null?'Edit template':'New template';['customTplList','builtinTplList'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});document.querySelectorAll('#tab-templates .sec-lbl').forEach(el=>el.style.display='none');var hdr=document.querySelector('#tab-templates>div:first-child');if(hdr)hdr.style.display='none';document.getElementById('tplBuilder').style.display='block';renderTplBuilderExs();}
+function closeTplBuilder(){document.getElementById('tplBuilder').style.display='none';renderTemplatesTab();}
+function renderTplBuilderExs(){const el=document.getElementById('tplExList');if(!tplBuilderExs.length){el.innerHTML='<div style="font-size:13px;color:var(--ink3);padding:8px 0">No exercises added yet.</div>';return;}el.innerHTML=tplBuilderExs.map((ex,i)=>'<div class="card" style="padding:12px 14px;margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-size:14px;font-weight:600;color:var(--navy)">'+ex.name+'</div><div style="display:flex;gap:6px">'+(i>0?'<button class="btn sm sec" style="padding:5px 9px;margin:0" onclick="moveTplEx('+i+',-1)">↑</button>':'')+(i<tplBuilderExs.length-1?'<button class="btn sm sec" style="padding:5px 9px;margin:0" onclick="moveTplEx('+i+',1)">↓</button>':'')+'<button class="btn sm danger-btn" style="padding:5px 9px;margin:0" onclick="removeTplEx('+i+')">✕</button></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><div><div class="inp-lbl">Sets</div><input type="number" class="inp inp-c" value="'+ex.sets+'" min="1" max="10" onchange="tplBuilderExs['+i+'].sets=parseInt(this.value)||3"></div><div><div class="inp-lbl">Reps</div><input type="number" class="inp inp-c" value="'+ex.reps+'" min="1" max="50" onchange="tplBuilderExs['+i+'].reps=parseInt(this.value)||10"></div><div><div class="inp-lbl">kg</div><input type="number" class="inp inp-c" value="'+ex.kg+'" min="0" step="2.5" onchange="tplBuilderExs['+i+'].kg=parseFloat(this.value)||0"></div></div></div>').join('');}
+function moveTplEx(i,dir){const ex=tplBuilderExs.splice(i,1)[0];tplBuilderExs.splice(i+dir,0,ex);renderTplBuilderExs();}
+function removeTplEx(i){tplBuilderExs.splice(i,1);renderTplBuilderExs();}
+function saveTpl(){const name=document.getElementById('tplName').value.trim();if(!name){toast('Enter a template name');return;}if(!tplBuilderExs.length){toast('Add at least one exercise');return;}const tpl={name,exercises:tplBuilderExs};if(tplEditIdx!==null){DB.customTemplates[tplEditIdx]=tpl;}else{DB.customTemplates.push(tpl);}saveDB();buildTplList();closeTplBuilder();toast(tplEditIdx!==null?'Template updated!':'Template created!');}
+function deleteTpl(i){if(!confirm('Delete "'+DB.customTemplates[i].name+'"?'))return;DB.customTemplates.splice(i,1);saveDB();buildTplList();renderTemplatesTab();toast('Template deleted');}
+function openExPicker(){document.getElementById('exPickerSearch').value='';renderExPicker();document.getElementById('exPickerOverlay').style.display='block';}
+function closeExPicker(){document.getElementById('exPickerOverlay').style.display='none';}
+function closeExPickerIfBg(e){if(e.target===document.getElementById('exPickerOverlay'))closeExPicker();}
+function renderExPicker(){const q=(document.getElementById('exPickerSearch').value||'').toLowerCase();const filtered=DB.exercises.filter(e=>e.name.toLowerCase().includes(q)||e.muscle.toLowerCase().includes(q));const groups={};filtered.forEach(e=>{if(!groups[e.muscle])groups[e.muscle]=[];groups[e.muscle].push(e);});document.getElementById('exPickerList').innerHTML=Object.entries(groups).map(([muscle,exs])=>'<div style="padding:10px 0 4px;font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em">'+muscle+'</div>'+exs.map(ex=>{const already=tplBuilderExs.some(e=>e.name===ex.name);return '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:0.5px solid var(--border)"><div><div style="font-size:14px;font-weight:500;color:var(--navy)">'+ex.name+'</div><div style="font-size:12px;color:var(--ink3)">'+ex.type+'</div></div><button class="btn sm '+(already?'ghost':'brand')+'" style="margin:0;padding:7px 14px" onclick="toggleExInTpl(this,''+ex.name.replace(/\/g,'\\').replace(/'/g,"\'")+'')">'+( already?'Added ✓':'+ Add')+'</button></div>';}).join('')).join('')||'<div style="padding:20px 0;text-align:center;font-size:13px;color:var(--ink3)">No exercises found</div>';}
+function toggleExInTpl(btn,name){const idx=tplBuilderExs.findIndex(e=>e.name===name);if(idx>=0){tplBuilderExs.splice(idx,1);btn.textContent='+ Add';btn.className='btn sm brand';btn.style.cssText='margin:0;padding:7px 14px';}else{const ex=DB.exercises.find(e=>e.name===name);tplBuilderExs.push({name:ex.name,sets:3,reps:10,kg:0});btn.textContent='Added ✓';btn.className='btn sm ghost';btn.style.cssText='margin:0;padding:7px 14px';}renderTplBuilderExs();}
+function initApp(){buildTplList();renderDash();renderSettings();renderTemplatesTab();}
 
 loadDB();
 if(DB.sessions.length>0||(DB.profile&&DB.profile.level)){
