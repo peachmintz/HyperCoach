@@ -252,6 +252,15 @@ select.inp{cursor:pointer}
 .nico{width:22px;height:22px;color:var(--ink3)}
 .nlbl{font-size:10px;color:var(--ink3)}
 
+/* Centre Log button — primary CTA */
+.nitem[data-n="log"]{padding:4px 8px}
+.nitem[data-n="log"] .nico-wrap{width:48px;height:48px;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:2px;box-shadow:0 2px 8px rgba(1,31,75,0.3)}
+.nitem[data-n="log"] .nico{color:#fff;width:24px;height:24px}
+.nitem[data-n="log"].on .nico{color:#fff}
+.nitem[data-n="log"].on .nico-wrap{background:var(--mid)}
+.nitem[data-n="log"] .nlbl{color:var(--navy);font-weight:600}
+.nitem[data-n="log"].on .nlbl{color:var(--dark)}
+
 /* Onboarding */
 .ob{padding:calc(24px + var(--safe-top)) 24px 24px;min-height:100vh;display:flex;flex-direction:column;background:var(--surface)}
 .ob-prog{display:flex;gap:4px;margin-bottom:28px}
@@ -623,7 +632,6 @@ input[type=number]{-moz-appearance:textfield}
   <div class="nitem on" data-n="dash" onclick="sw('dash',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="nlbl">Home</span></div>
   <div class="nitem" data-n="log" onclick="sw('log',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg><span class="nlbl">Log</span></div>
   <div class="nitem" data-n="coach" onclick="sw('coach',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><span class="nlbl">Coach</span></div>
-  <div class="nitem" data-n="progress" onclick="sw('progress',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg><span class="nlbl">Progress</span></div>
   <div class="nitem" data-n="settings" onclick="sw('settings',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="nlbl">Settings</span></div>
 </div>
 
