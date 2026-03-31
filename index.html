@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HyperCoach">
+<meta name="theme-color" content="#011f4b">
+<meta name="description" content="Your pocket hypertrophy training coach">
+
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="apple-touch-startup-image" href="icons/icon-512.png">
+
+<title>HyperCoach</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#011f4b;--dark:#03396c;--mid:#005b96;--steel:#6497b1;--powder:#b3cde0;
+  --powder-lt:#deedf5;--powder-xlt:#eef5fa;
+  --ink:#011f4b;--ink2:#03396c;--ink3:#6497b1;
+  --surface:#ffffff;--surface2:#f0f6fb;--surface3:#deedf5;
+  --border:rgba(1,31,75,0.1);--border2:rgba(1,31,75,0.18);
+  --success:#1a6b3c;--success-bg:#e8f5ee;--success-border:rgba(26,107,60,.2);
+  --warning:#7a4e0d;--warning-bg:#fdf3e3;--warning-border:rgba(122,78,13,.2);
+  --danger:#8b1a1a;--danger-bg:#fdf0f0;--danger-border:rgba(139,26,26,.2);
+  --r4:4px;--r8:8px;--r12:12px;--r20:20px;--rpill:9999px;
+  --safe-top:env(safe-area-inset-top);
+  --safe-bottom:env(safe-area-inset-bottom);
+}
+html{height:100%;background:#011f4b}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  color:var(--ink);background:#f0f6fb;
+  min-height:100%;min-height:-webkit-fill-available;
+  -webkit-text-size-adjust:100%;
+  overscroll-behavior:none;
+}
+.app{
+  max-width:480px;margin:0 auto;
+  padding-top:var(--safe-top);
+  padding-bottom:calc(68px + var(--safe-bottom));
+  background:var(--surface2);
+  min-height:100vh;min-height:-webkit-fill-available;
+}
+
+/* Topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:0.5px solid var(--border);background:var(--surface)}
+.logo{font-size:18px;font-weight:600;color:var(--navy);letter-spacing:-0.01em}
+.logo span{color:var(--mid)}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.streak-pill{display:flex;align-items:center;gap:5px;background:var(--navy);color:#fff;font-size:12px;font-weight:500;padding:4px 10px;border-radius:var(--rpill)}
+.streak-dot{width:6px;height:6px;border-radius:50%;background:var(--powder)}
+.goal-badge{font-size:11px;font-weight:500;padding:3px 9px;border-radius:var(--rpill);background:var(--powder-xlt);color:var(--dark);border:0.5px solid var(--powder)}
+
+/* Tab bar */
+.tabbar{display:flex;gap:0;padding:0 16px;overflow-x:auto;scrollbar-width:none;border-bottom:0.5px solid var(--border);background:var(--surface)}
+.tabbar::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:10px 14px;font-size:12px;font-weight:500;cursor:pointer;color:var(--ink3);background:transparent;border:none;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;-webkit-tap-highlight-color:transparent}
+.tab.on{color:var(--navy);border-bottom-color:var(--mid)}
+.tab:hover:not(.on){color:var(--dark)}
+
+/* Sections */
+.sec{display:none;padding:16px 16px 0}
+.sec.vis{display:block}
+.sec-lbl{font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+
+/* Cards */
+.card{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--r12);padding:16px;margin-bottom:12px}
+.card.surface{background:var(--surface2);border-color:transparent}
+.card.accent{border:1.5px solid var(--mid);background:var(--powder-xlt)}
+.card.alert-s{background:var(--success-bg);border:0.5px solid var(--success-border)}
+.card.alert-w{background:var(--warning-bg);border:0.5px solid var(--warning-border)}
+.card.alert-d{background:var(--danger-bg);border:0.5px solid var(--danger-border)}
+.card-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card-title{font-size:15px;font-weight:600;color:var(--navy)}
+.card-sub{font-size:12px;color:var(--ink3);margin-top:3px}
+
+/* Stat grid */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r12);padding:14px 16px}
+.stat-lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);margin-bottom:6px}
+.stat-val{font-size:26px;font-weight:600;letter-spacing:-0.02em;line-height:1;color:var(--navy)}
+.stat-unit{font-size:12px;color:var(--ink3);margin-left:3px;font-weight:400}
+.stat-delta{font-size:11px;margin-top:4px;color:var(--success)}
+.stat-delta.neg{color:var(--danger)}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:var(--rpill);font-size:11px;font-weight:600}
+.bn{background:var(--surface2);color:var(--ink2)}
+.bb{background:var(--powder-xlt);color:var(--dark);border:0.5px solid var(--powder)}
+.bs{background:var(--success-bg);color:var(--success)}
+.bw{background:var(--warning-bg);color:var(--warning)}
+.bd{background:var(--danger-bg);color:var(--danger)}
+
+/* Progress bars */
+.prog-bg{background:var(--surface3);border-radius:var(--rpill);height:6px;overflow:hidden;margin:4px 0 2px}
+.prog-bar{height:6px;border-radius:var(--rpill);transition:width .5s}
+
+/* Buttons */
+.btn{width:100%;padding:13px;border-radius:var(--rpill);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s;border:none;margin-top:10px;-webkit-tap-highlight-color:transparent}
+.btn.pri{background:var(--navy);color:#fff}
+.btn.sec{background:transparent;border:0.5px solid var(--border2);color:var(--navy);margin-top:8px}
+.btn.brand{background:var(--mid);color:#fff}
+.btn.ghost{background:var(--surface2);color:var(--ink2);margin-top:8px}
+.btn.danger-btn{background:var(--danger-bg);color:var(--danger);border:0.5px solid var(--danger-border);margin-top:8px}
+.btn.sm{width:auto;padding:8px 14px;font-size:12px;margin:0}
+.btn:active{opacity:.75}
+.btn-row{display:flex;gap:8px;margin-top:12px}
+.btn-row .btn{margin-top:0;flex:1}
+
+/* Selection pills */
+.pill-group{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.pill{padding:7px 15px;border-radius:var(--rpill);font-size:13px;font-weight:500;border:0.5px solid var(--border2);cursor:pointer;background:var(--surface);color:var(--ink3);-webkit-tap-highlight-color:transparent}
+.pill.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.pill:active{opacity:.7}
+
+/* Inputs */
+.inp{width:100%;padding:10px 12px;border-radius:var(--r8);border:0.5px solid var(--border2);background:var(--surface2);font-size:14px;color:var(--navy);font-family:inherit;-webkit-appearance:none;appearance:none}
+.inp:focus{outline:2px solid var(--mid);border-color:transparent}
+select.inp{cursor:pointer}
+.inp-c{text-align:center;padding:8px 4px}
+.inp-lbl{font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+
+/* Exercise log grid */
+.ex-grid{display:grid;grid-template-columns:1fr 44px 44px 52px 52px;gap:6px;align-items:center;padding:9px 0;border-bottom:0.5px solid var(--border)}
+.ex-grid:last-child{border-bottom:none}
+.ex-grid-hdr{display:grid;grid-template-columns:1fr 44px 44px 52px 52px;gap:6px;margin-bottom:4px}
+.col-h{font-size:11px;color:var(--ink3);text-align:center;font-weight:500}
+.col-h:first-child{text-align:left}
+.ex-name{font-size:13px;color:var(--navy);line-height:1.3;font-weight:500}
+
+/* Alert banners */
+.alert-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.alert-body{font-size:12px;line-height:1.5;opacity:.9}
+.at-w{color:var(--warning)}.ab-w{color:var(--warning)}
+.at-d{color:var(--danger)}.ab-d{color:var(--danger)}
+.at-s{color:var(--success)}.ab-s{color:var(--success)}
+
+/* PR Banner */
+.pr-banner{background:var(--navy);border-radius:var(--r12);padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+.pr-star{width:32px;height:32px;background:var(--mid);border-radius:var(--r8);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pr-text{color:#fff;font-size:13px;line-height:1.5}
+.pr-text strong{display:block;font-weight:600;font-size:14px;color:var(--powder)}
+
+/* Timer */
+.timer-card{background:var(--surface2);border-radius:var(--r12);padding:16px;margin-top:12px}
+.timer-num{font-size:44px;font-weight:600;text-align:center;color:var(--navy);letter-spacing:-0.03em;padding:8px 0 4px}
+.timer-sub{font-size:12px;color:var(--ink3);text-align:center;margin-bottom:10px}
+.timer-prog{height:4px;background:var(--surface3);border-radius:var(--rpill);overflow:hidden;margin-bottom:12px}
+.timer-progbar{height:4px;background:var(--mid);border-radius:var(--rpill);transition:width .9s linear}
+.tbrow{display:flex;gap:8px}
+.tbtn{flex:1;padding:10px;border-radius:var(--r8);font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid var(--border2);background:var(--surface);color:var(--navy);font-family:inherit;-webkit-tap-highlight-color:transparent}
+.tbtn.go{background:var(--navy);color:#fff;border:none}
+.tbtn:active{opacity:.7}
+
+/* Coach mode */
+.coach-ex-name{font-size:22px;font-weight:600;color:var(--navy);letter-spacing:-0.01em;margin-bottom:4px}
+.coach-ex-sub{font-size:13px;color:var(--ink3);margin-bottom:18px}
+.set-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:0.5px solid var(--border);-webkit-tap-highlight-color:transparent;cursor:pointer}
+.set-row:last-child{border-bottom:none}
+.set-num{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;border:0.5px solid var(--border2);color:var(--ink3)}
+.set-num.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.set-num.done{background:var(--success-bg);color:var(--success);border-color:var(--success-border)}
+.set-info{flex:1}
+.set-detail{font-size:14px;color:var(--navy);font-weight:500}
+.set-sub{font-size:12px;color:var(--ink3);margin-top:1px}
+.set-tag{font-size:11px;color:var(--ink3)}
+
+/* History */
+.hist-item{padding:13px 0;border-bottom:0.5px solid var(--border);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.hist-item:last-child{border-bottom:none}
+.hist-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+.hist-name{font-size:14px;font-weight:600;color:var(--navy)}
+.hist-date{font-size:12px;color:var(--ink3)}
+.hist-meta{font-size:12px;color:var(--ink3)}
+.hist-detail{display:none;margin-top:10px;background:var(--surface2);border-radius:var(--r8);padding:10px 12px}
+.hist-detail.open{display:block}
+.hist-ex{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:0.5px solid var(--border)}
+.hist-ex:last-child{border-bottom:none}
+.hist-ex-name{color:var(--navy);font-weight:500}
+.hist-ex-val{color:var(--ink3)}
+
+/* Lift progress */
+.lift-card{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--r12);padding:14px 16px;margin-bottom:8px}
+.lift-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px}
+.lift-name{font-size:14px;font-weight:600;color:var(--navy)}
+.lift-val{font-size:18px;font-weight:600;color:var(--navy)}
+.lift-unit{font-size:12px;color:var(--ink3);margin-left:2px}
+.lift-meta{font-size:12px;color:var(--ink3);margin-bottom:8px}
+.mini-chart{display:flex;align-items:flex-end;gap:3px;height:32px}
+.mbar{flex:1;border-radius:2px 2px 0 0;min-height:3px;background:var(--surface3);border:0.5px solid var(--border)}
+.mbar.cur{background:var(--mid);border-color:var(--mid)}
+
+/* Vol row */
+.vol-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.vol-name{font-size:13px;color:var(--navy);font-weight:500;min-width:90px}
+.vol-bg{flex:1;height:6px;background:var(--surface3);border-radius:var(--rpill);overflow:hidden}
+.vol-bar{height:6px;border-radius:var(--rpill);transition:width .4s}
+.vol-val{font-size:11px;color:var(--ink3);min-width:34px;text-align:right}
+
+/* Body measurements */
+.meas-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.meas-wrap{display:flex;flex-direction:column;gap:4px}
+
+/* Library */
+.lib-item{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:0.5px solid var(--border)}
+.lib-item:last-child{border-bottom:none}
+.lib-name{font-size:14px;color:var(--navy);font-weight:500}
+.lib-sub{font-size:12px;color:var(--ink3);margin-top:1px}
+
+/* 1RM result */
+.rm-result{background:var(--navy);border-radius:var(--r12);padding:16px;text-align:center;margin-top:10px}
+.rm-val{font-size:32px;font-weight:600;color:#fff;letter-spacing:-0.02em}
+.rm-lbl{font-size:12px;color:var(--powder);margin-top:3px}
+.rm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.rm-cell{background:rgba(255,255,255,.1);border-radius:var(--r8);padding:8px;text-align:center}
+.rm-pct{font-size:13px;font-weight:600;color:var(--powder)}
+.rm-kg{font-size:11px;color:rgba(179,205,224,.7);margin-top:2px}
+
+/* Settings */
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:0.5px solid var(--border)}
+.setting-row:last-child{border-bottom:none}
+.setting-lbl{font-size:14px;color:var(--navy);font-weight:500}
+.setting-sub{font-size:12px;color:var(--ink3);margin-top:2px}
+
+/* Split card */
+.split-card{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--r12);padding:16px;margin-bottom:10px}
+.split-name{font-size:15px;font-weight:600;color:var(--navy)}
+.split-desc{font-size:13px;color:var(--ink3);line-height:1.5;margin:6px 0 10px}
+.day-row{display:flex;gap:8px;margin-bottom:4px;font-size:13px}
+.day-lbl{font-size:11px;font-weight:600;min-width:28px;color:var(--ink3);text-transform:uppercase;letter-spacing:.04em;padding-top:1px}
+.day-rest{color:var(--border2)}
+
+/* Warm-up chips */
+.warm-chip{display:inline-flex;align-items:center;background:var(--powder-xlt);border:0.5px solid var(--powder);border-radius:var(--r8);padding:5px 10px;font-size:12px;color:var(--dark);margin:3px;font-weight:500}
+
+/* Bottom nav */
+.bnav{
+  display:flex;justify-content:space-around;
+  padding:10px 0;
+  padding-bottom:calc(10px + var(--safe-bottom));
+  background:var(--surface);
+  border-top:0.5px solid var(--border);
+  position:sticky;bottom:0;
+}
+.nitem{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 14px;border-radius:var(--r8);min-width:44px;-webkit-tap-highlight-color:transparent}
+.nitem.on .nico{color:var(--mid)}
+.nitem.on .nlbl{color:var(--dark);font-weight:600}
+.nico{width:22px;height:22px;color:var(--ink3)}
+.nlbl{font-size:10px;color:var(--ink3)}
+
+/* Onboarding */
+.ob{padding:calc(24px + var(--safe-top)) 24px 24px;min-height:100vh;display:flex;flex-direction:column;background:var(--surface)}
+.ob-prog{display:flex;gap:4px;margin-bottom:28px}
+.ob-dot{flex:1;height:3px;border-radius:2px;background:var(--surface3)}
+.ob-dot.done{background:var(--mid)}
+.ob-q{font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-0.02em;margin-bottom:6px}
+.ob-hint{font-size:14px;color:var(--ink3);margin-bottom:24px;line-height:1.6}
+.ob-opts{display:flex;flex-direction:column;gap:10px;flex:1}
+.ob-opt{padding:16px;border:0.5px solid var(--border2);border-radius:var(--r12);cursor:pointer;background:var(--surface);text-align:left;width:100%;font-family:inherit;-webkit-tap-highlight-color:transparent}
+.ob-opt:active{background:var(--surface2)}
+.ob-opt.sel{border:2px solid var(--mid);background:var(--powder-xlt)}
+.ob-opt-title{font-size:15px;font-weight:600;color:var(--navy)}
+.ob-opt-sub{font-size:13px;color:var(--ink3);margin-top:3px}
+.ob-nav{display:flex;gap:10px;margin-top:24px;padding-bottom:var(--safe-bottom)}
+.ob-nav .btn{margin-top:0}
+
+.divider{height:0.5px;background:var(--border);margin:12px 0}
+
+/* Toast */
+.toast{
+  position:fixed;top:calc(16px + var(--safe-top));left:50%;
+  transform:translateX(-50%);
+  background:var(--navy);color:#fff;font-size:13px;font-weight:500;
+  padding:9px 18px;border-radius:var(--rpill);
+  z-index:100;opacity:0;transition:opacity .2s;
+  pointer-events:none;white-space:nowrap;
+  max-width:calc(100vw - 40px);
+}
+.toast.on{opacity:1}
+
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none}
+input[type=number]{-moz-appearance:textfield}
+</style>
+</head>
+<body>
+
+<!-- ONBOARDING -->
+<div id="onboarding">
+<div class="ob">
+  <div class="ob-prog"><div class="ob-dot" id="od0"></div><div class="ob-dot" id="od1"></div><div class="ob-dot" id="od2"></div><div class="ob-dot" id="od3"></div></div>
+  <div id="obs0" style="display:flex;flex-direction:column;flex:1">
+    <div class="ob-q">Training experience?</div>
+    <div class="ob-hint">Sets your starting volume and progression speed.</div>
+    <div class="ob-opts">
+      <button class="ob-opt" onclick="obSel(0,0,this)"><div class="ob-opt-title">Beginner</div><div class="ob-opt-sub">Under 1 year consistent training</div></button>
+      <button class="ob-opt" onclick="obSel(0,1,this)"><div class="ob-opt-title">Intermediate</div><div class="ob-opt-sub">1–3 years, comfortable with the main lifts</div></button>
+      <button class="ob-opt" onclick="obSel(0,2,this)"><div class="ob-opt-title">Advanced</div><div class="ob-opt-sub">3+ years, serious about programming</div></button>
+    </div>
+    <div class="ob-nav"><button class="btn pri" onclick="obNext(0)">Next</button></div>
+  </div>
+  <div id="obs1" style="display:none;flex-direction:column;flex:1">
+    <div class="ob-q">Days per week?</div>
+    <div class="ob-hint">Consistency beats frequency — be realistic.</div>
+    <div class="ob-opts">
+      <button class="ob-opt" onclick="obSel(1,0,this)"><div class="ob-opt-title">3 days</div><div class="ob-opt-sub">Full body split</div></button>
+      <button class="ob-opt" onclick="obSel(1,1,this)"><div class="ob-opt-title">4 days</div><div class="ob-opt-sub">Upper / Lower split</div></button>
+      <button class="ob-opt" onclick="obSel(1,2,this)"><div class="ob-opt-title">5–6 days</div><div class="ob-opt-sub">PPL — maximum volume potential</div></button>
+    </div>
+    <div class="ob-nav"><button class="btn sec" onclick="obBack(1)">Back</button><button class="btn pri" onclick="obNext(1)">Next</button></div>
+  </div>
+  <div id="obs2" style="display:none;flex-direction:column;flex:1">
+    <div class="ob-q">Primary goal?</div>
+    <div class="ob-hint">Adjusts rep ranges, rest times and overload logic.</div>
+    <div class="ob-opts">
+      <button class="ob-opt" onclick="obSel(2,0,this)"><div class="ob-opt-title">Hypertrophy</div><div class="ob-opt-sub">Maximise muscle size — 8–15 reps, moderate load</div></button>
+      <button class="ob-opt" onclick="obSel(2,1,this)"><div class="ob-opt-title">Strength</div><div class="ob-opt-sub">Maximise lifts — 3–6 reps, heavy load</div></button>
+      <button class="ob-opt" onclick="obSel(2,2,this)"><div class="ob-opt-title">Recomp</div><div class="ob-opt-sub">Build muscle while leaning out — 8–12 reps</div></button>
+    </div>
+    <div class="ob-nav"><button class="btn sec" onclick="obBack(2)">Back</button><button class="btn pri" onclick="obNext(2)">Next</button></div>
+  </div>
+  <div id="obs3" style="display:none;flex-direction:column;flex:1">
+    <div class="ob-q">Equipment available?</div>
+    <div class="ob-hint">Templates will match what you have access to.</div>
+    <div class="ob-opts">
+      <button class="ob-opt" onclick="obSel(3,0,this)"><div class="ob-opt-title">Full gym</div><div class="ob-opt-sub">Barbells, dumbbells, cables, machines</div></button>
+      <button class="ob-opt" onclick="obSel(3,1,this)"><div class="ob-opt-title">Home gym</div><div class="ob-opt-sub">Barbells / dumbbells, limited machines</div></button>
+      <button class="ob-opt" onclick="obSel(3,2,this)"><div class="ob-opt-title">Bodyweight only</div><div class="ob-opt-sub">No equipment — calisthenics focus</div></button>
+    </div>
+    <div class="ob-nav"><button class="btn sec" onclick="obBack(3)">Back</button><button class="btn brand" onclick="obFinish()">Get started</button></div>
+  </div>
+</div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" style="display:none">
+<div class="app">
+
+<div class="topbar">
+  <div class="logo">Hyper<span>Coach</span></div>
+  <div class="topbar-right">
+    <div id="goalBadge" class="goal-badge">Hypertrophy</div>
+    <div class="streak-pill"><div class="streak-dot"></div><span id="streakTxt">0d</span></div>
+  </div>
+</div>
+
+<div class="tabbar">
+  <div class="tab on" data-t="dash" onclick="sw('dash',this)">Home</div>
+  <div class="tab" data-t="log" onclick="sw('log',this)">Log</div>
+  <div class="tab" data-t="coach" onclick="sw('coach',this)">Coach</div>
+  <div class="tab" data-t="history" onclick="sw('history',this)">History</div>
+  <div class="tab" data-t="progress" onclick="sw('progress',this)">Progress</div>
+  <div class="tab" data-t="body" onclick="sw('body',this)">Body</div>
+  <div class="tab" data-t="library" onclick="sw('library',this)">Library</div>
+  <div class="tab" data-t="settings" onclick="sw('settings',this)">Settings</div>
+</div>
+
+<!-- HOME -->
+<div class="sec vis" id="tab-dash">
+  <div class="pill-group" id="goalBar"></div>
+  <div id="alerts"></div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-lbl">Weekly sets</div><div class="stat-val" id="d-vol">0</div><div class="stat-delta" id="d-vold">—</div></div>
+    <div class="stat-card"><div class="stat-lbl">Sessions</div><div class="stat-val" id="d-sess">0</div><div class="stat-delta" id="d-sessd">Start logging</div></div>
+    <div class="stat-card"><div class="stat-lbl">Best bench</div><div class="stat-val" id="d-bench">—<span class="stat-unit">kg</span></div><div class="stat-delta" id="d-benchd">—</div></div>
+    <div class="stat-card"><div class="stat-lbl">Streak</div><div class="stat-val" id="d-streak">0<span class="stat-unit">d</span></div><div class="stat-delta">Keep it up</div></div>
+  </div>
+  <div id="prBanner"></div>
+  <div class="sec-lbl">Overload targets</div>
+  <div class="card" id="olCard"><div style="font-size:13px;color:var(--ink3)">Log a session to see overload targets.</div></div>
+  <div class="sec-lbl">Weekly volume landmarks</div>
+  <div class="card" id="volCard"><div style="font-size:13px;color:var(--ink3)">Log a session to see volume by muscle.</div></div>
+  <div class="sec-lbl">Recovery check-in</div>
+  <div class="card">
+    <div style="font-size:13px;color:var(--ink3);margin-bottom:10px">How are your muscles feeling today?</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn sm sec" onclick="toast('Full intensity — let\'s go!')">Fresh</button>
+      <button class="btn sm sec" onclick="toast('Moderate session recommended.')">A bit sore</button>
+      <button class="btn sm sec" onclick="toast('Rest day — recovery is training too.')">Very sore</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOG -->
+<div class="sec" id="tab-log">
+  <div class="sec-lbl">Choose template</div>
+  <div id="tplList"></div>
+  <div id="logPanel" style="display:none">
+    <div class="card">
+      <div class="card-row" style="margin-bottom:14px">
+        <div><div class="card-title" id="logTitle"></div><div class="card-sub" id="lastSess"></div></div>
+        <span class="badge bs">Active</span>
+      </div>
+      <div id="warmupSection" style="display:none;margin-bottom:14px">
+        <div class="sec-lbl" style="margin-bottom:6px">Warm-up sets</div>
+        <div id="warmupSets"></div>
+      </div>
+      <div class="ex-grid-hdr">
+        <div class="col-h">Exercise</div><div class="col-h">Sets</div><div class="col-h">Reps</div><div class="col-h">kg</div><div class="col-h">RIR</div>
+      </div>
+      <div class="divider" style="margin-top:0;margin-bottom:0"></div>
+      <div id="exRows"></div>
+      <div id="olHints" style="margin-top:8px"></div>
+      <div style="margin-top:14px">
+        <div class="sec-lbl" style="margin-bottom:8px">Rest timer</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+          <button class="btn sm sec" onclick="startTimer(180)">Compound 3 min</button>
+          <button class="btn sm sec" onclick="startTimer(90)">Isolation 90s</button>
+          <button class="btn sm sec" onclick="startTimer(120)">2 min</button>
+        </div>
+        <div id="timerWrap" style="display:none">
+          <div class="timer-card">
+            <div class="timer-prog"><div class="timer-progbar" id="tprogbar" style="width:100%"></div></div>
+            <div class="timer-num" id="tDisp">3:00</div>
+            <div class="timer-sub" id="tLbl">Rest — take your time</div>
+            <div class="tbrow">
+              <button class="tbtn" onclick="addTime(30)">+30s</button>
+              <button class="tbtn" onclick="stopTimer()">Skip</button>
+              <button class="tbtn go" id="tGoBtn" onclick="toggleTimer()">Pause</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn pri" style="margin:0;flex:1" onclick="saveSession()">Save session</button>
+        <button class="btn sm sec" style="padding:13px 16px;margin:0" onclick="sw('coach',document.querySelector('[data-t=coach]'))">Coach</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COACH -->
+<div class="sec" id="tab-coach">
+  <div id="coachEmpty" class="card alert-w" style="margin-bottom:0">
+    <div class="alert-title at-w">No active session</div>
+    <div class="alert-body ab-w" style="margin-bottom:10px">Select a template in Log first, then switch here for focused coaching.</div>
+    <button class="btn sm sec" onclick="sw('log',document.querySelector('[data-t=log]'))">Go to Log</button>
+  </div>
+  <div id="coachActive" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div><div style="font-size:13px;color:var(--ink3);font-weight:500" id="coachSessName"></div><div style="font-size:11px;color:var(--steel);margin-top:2px" id="coachProgTxt"></div></div>
+      <button class="btn sm brand" onclick="saveSession()">Finish</button>
+    </div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px" id="coachNav"></div>
+    <div class="card" id="coachCard">
+      <div class="coach-ex-name" id="coachExName"></div>
+      <div class="coach-ex-sub" id="coachExSub"></div>
+      <div id="coachSets"></div>
+      <div style="margin-top:12px">
+        <div class="timer-prog"><div class="timer-progbar" id="ctprogbar" style="width:100%"></div></div>
+        <div id="ctDisp" style="display:none;font-size:36px;font-weight:600;text-align:center;color:var(--navy);padding:8px 0 2px;letter-spacing:-0.02em"></div>
+        <div id="ctLbl" style="display:none;font-size:12px;color:var(--ink3);text-align:center;margin-bottom:8px"></div>
+        <div id="ctBtns" style="display:none" class="tbrow">
+          <button class="tbtn" onclick="addCTime(30)">+30s</button>
+          <button class="tbtn" onclick="stopCTimer()">Skip</button>
+          <button class="tbtn go" id="ctGoBtn" onclick="toggleCTimer()">Pause</button>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn sec" style="margin:0" onclick="coachPrev()">← Previous</button>
+      <button class="btn pri" style="margin:0" onclick="coachNext()">Next exercise →</button>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div class="sec" id="tab-history">
+  <div class="sec-lbl">Past sessions</div>
+  <div class="card" style="padding:0 16px" id="histList"><div style="padding:14px 0;font-size:13px;color:var(--ink3)">No sessions logged yet.</div></div>
+  <button class="btn sec" onclick="exportCSV()">Export as CSV</button>
+</div>
+
+<!-- PROGRESS -->
+<div class="sec" id="tab-progress">
+  <div class="sec-lbl">Key lifts</div>
+  <div id="liftHist"></div>
+  <div class="sec-lbl" style="margin-top:4px">Monthly volume</div>
+  <div class="card" style="padding:16px">
+    <div id="chartLeg" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:12px;color:var(--ink3)"></div>
+    <div style="position:relative;width:100%;height:170px"><canvas id="volChart"></canvas></div>
+  </div>
+  <div class="sec-lbl" style="margin-top:4px">Overload principles</div>
+  <div class="card">
+    <div style="display:flex;flex-direction:column;gap:12px;font-size:13px;line-height:1.55;color:var(--ink2)">
+      <div style="display:flex;gap:10px"><div style="width:3px;flex-shrink:0;background:var(--mid)"></div><div><strong style="font-weight:600;color:var(--navy)">Load progression</strong> — add 2.5 kg when all sets complete at top of rep range</div></div>
+      <div style="display:flex;gap:10px"><div style="width:3px;flex-shrink:0;background:var(--steel)"></div><div><strong style="font-weight:600;color:var(--navy)">Rep progression</strong> — work bottom to top of rep range before adding weight</div></div>
+      <div style="display:flex;gap:10px"><div style="width:3px;flex-shrink:0;background:var(--success)"></div><div><strong style="font-weight:600;color:var(--navy)">Set progression</strong> — add 1 set per muscle per week up to MRV</div></div>
+      <div style="display:flex;gap:10px"><div style="width:3px;flex-shrink:0;background:var(--warning)"></div><div><strong style="font-weight:600;color:var(--navy)">Deload</strong> — every 4–6 weeks reduce volume 40–50% to recover</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- BODY -->
+<div class="sec" id="tab-body">
+  <div class="sec-lbl">Log measurements</div>
+  <div class="card">
+    <div class="meas-grid">
+      <div class="meas-wrap"><div class="inp-lbl">Bodyweight (kg)</div><input type="number" class="inp" id="mBw" placeholder="80" step="0.1"></div>
+      <div class="meas-wrap"><div class="inp-lbl">Body fat %</div><input type="number" class="inp" id="mBf" placeholder="15" step="0.5"></div>
+      <div class="meas-wrap"><div class="inp-lbl">Chest (cm)</div><input type="number" class="inp" id="mChest" placeholder="100"></div>
+      <div class="meas-wrap"><div class="inp-lbl">Waist (cm)</div><input type="number" class="inp" id="mWaist" placeholder="80"></div>
+      <div class="meas-wrap"><div class="inp-lbl">Arms (cm)</div><input type="number" class="inp" id="mArms" placeholder="35"></div>
+      <div class="meas-wrap"><div class="inp-lbl">Legs (cm)</div><input type="number" class="inp" id="mLegs" placeholder="55"></div>
+    </div>
+    <button class="btn brand" onclick="saveMeas()">Save measurements</button>
+  </div>
+  <div class="sec-lbl">History</div>
+  <div class="card" style="padding:0 16px" id="measHist"><div style="padding:12px 0;font-size:13px;color:var(--ink3)">No measurements yet.</div></div>
+  <div class="sec-lbl" style="margin-top:4px">Bodyweight trend</div>
+  <div class="card" style="padding:14px"><div style="position:relative;width:100%;height:160px"><canvas id="bodyChart"></canvas></div></div>
+</div>
+
+<!-- LIBRARY -->
+<div class="sec" id="tab-library">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div class="sec-lbl" style="margin-bottom:0">Exercise library</div>
+    <button class="btn sm sec" onclick="toggleAddEx()">+ Add</button>
+  </div>
+  <div id="addExForm" style="display:none" class="card">
+    <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:12px">New exercise</div>
+    <div class="inp-lbl">Name</div><input class="inp" id="nxName" placeholder="e.g. Cable lateral raise" style="margin-bottom:10px">
+    <div class="inp-lbl">Primary muscle</div>
+    <select class="inp" id="nxMus" style="margin-bottom:10px"><option value="">Select muscle</option><option>Chest</option><option>Back</option><option>Shoulders</option><option>Quads</option><option>Hamstrings</option><option>Glutes</option><option>Biceps</option><option>Triceps</option><option>Core</option><option>Calves</option></select>
+    <div class="inp-lbl">Equipment</div>
+    <select class="inp" id="nxType" style="margin-bottom:14px"><option value="">Select equipment</option><option>Barbell</option><option>Dumbbell</option><option>Cable</option><option>Machine</option><option>Bodyweight</option><option>Other</option></select>
+    <div class="btn-row"><button class="btn brand sm" style="flex:1;padding:12px" onclick="addEx()">Save exercise</button><button class="btn sec sm" style="flex:1;padding:12px" onclick="toggleAddEx()">Cancel</button></div>
+  </div>
+  <input class="inp" id="exSearch" placeholder="Search exercises..." oninput="renderLib()" style="margin-bottom:10px;border-radius:var(--rpill)">
+  <div class="pill-group" id="muscleFilter"></div>
+  <div class="card" style="padding:0 16px" id="exList"></div>
+  <div class="sec-lbl" style="margin-top:16px">1RM calculator</div>
+  <div class="card">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:2px">
+      <div><div class="inp-lbl">Weight (kg)</div><input type="number" class="inp inp-c" id="rmKg" placeholder="100" oninput="calcRM()" step="2.5"></div>
+      <div><div class="inp-lbl">Reps</div><input type="number" class="inp inp-c" id="rmReps" placeholder="5" oninput="calcRM()"></div>
+      <div><div class="inp-lbl">RIR</div><select class="inp inp-c" id="rmRir" onchange="calcRM()"><option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option></select></div>
+    </div>
+    <div id="rmResult" style="display:none">
+      <div class="rm-result"><div class="rm-val" id="rmVal">—</div><div class="rm-lbl">Estimated 1RM</div><div class="rm-grid" id="rmGrid"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="sec" id="tab-settings">
+  <div class="sec-lbl">Profile</div>
+  <div class="card" style="padding:0 16px">
+    <div class="setting-row"><div><div class="setting-lbl">Experience level</div><div class="setting-sub" id="sLvlSub">—</div></div><select class="inp" style="width:auto" id="sLvl" onchange="updSet('level',this.value)"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select></div>
+    <div class="setting-row"><div><div class="setting-lbl">Training days</div><div class="setting-sub">Per week</div></div><select class="inp" style="width:auto" id="sDays" onchange="updSet('days',parseInt(this.value))"><option value="3">3 days</option><option value="4">4 days</option><option value="5">5 days</option><option value="6">6 days</option></select></div>
+    <div class="setting-row"><div><div class="setting-lbl">Equipment</div></div><select class="inp" style="width:auto" id="sEquip" onchange="updSet('equipment',this.value)"><option value="full">Full gym</option><option value="home">Home gym</option><option value="bodyweight">Bodyweight</option></select></div>
+  </div>
+  <div class="sec-lbl" style="margin-top:4px">Recommended split</div>
+  <div class="card accent" id="splitRec"></div>
+  <div class="sec-lbl" style="margin-top:4px">Training splits</div>
+  <div class="split-card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px"><div class="split-name">Push / Pull / Legs</div><span class="badge bb">5–6 days</span></div>
+    <div class="split-desc">Highest frequency per muscle group. Ideal for intermediate to advanced lifters.</div>
+    <div class="day-row"><div class="day-lbl">Mon</div><div>Push A</div></div><div class="day-row"><div class="day-lbl">Tue</div><div>Pull A</div></div><div class="day-row"><div class="day-lbl">Wed</div><div>Legs A</div></div><div class="day-row"><div class="day-lbl">Thu</div><div>Push B</div></div><div class="day-row"><div class="day-lbl">Fri</div><div>Pull B</div></div><div class="day-row"><div class="day-lbl">Sat</div><div>Legs B</div></div><div class="day-row"><div class="day-lbl">Sun</div><div class="day-rest">Rest</div></div>
+    <button class="btn sec" onclick="DB.split='PPL';saveDB();toast('PPL activated')">Use this split</button>
+  </div>
+  <div class="split-card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px"><div class="split-name">Upper / Lower</div><span class="badge bs">4 days</span></div>
+    <div class="split-desc">Each muscle hit twice per week with full recovery between sessions.</div>
+    <div class="day-row"><div class="day-lbl">Mon</div><div>Upper A</div></div><div class="day-row"><div class="day-lbl">Tue</div><div>Lower A</div></div><div class="day-row"><div class="day-lbl">Thu</div><div>Upper B</div></div><div class="day-row"><div class="day-lbl">Fri</div><div>Lower B</div></div><div class="day-row"><div class="day-lbl">Rest</div><div class="day-rest">Wed / Sat / Sun</div></div>
+    <button class="btn sec" onclick="DB.split='Upper/Lower';saveDB();toast('Upper/Lower activated')">Use this split</button>
+  </div>
+  <div class="split-card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px"><div class="split-name">Full body (3-day)</div><span class="badge bn">3 days</span></div>
+    <div class="split-desc">Maximum frequency per session. Best for beginners or limited schedules.</div>
+    <div class="day-row"><div class="day-lbl">Mon</div><div>Full body A</div></div><div class="day-row"><div class="day-lbl">Wed</div><div>Full body B</div></div><div class="day-row"><div class="day-lbl">Fri</div><div>Full body C</div></div>
+    <button class="btn sec" onclick="DB.split='Full Body';saveDB();toast('Full Body activated')">Use this split</button>
+  </div>
+  <div class="sec-lbl" style="margin-top:4px">Data</div>
+  <div class="card" style="padding:0 16px">
+    <div class="setting-row"><div><div class="setting-lbl">Export history</div><div class="setting-sub">Download all sessions as CSV</div></div><button class="btn sm sec" onclick="exportCSV()">Export</button></div>
+    <div class="setting-row"><div><div class="setting-lbl">Clear all data</div><div class="setting-sub" style="color:var(--danger)">Cannot be undone</div></div><button class="btn sm danger-btn" style="margin:0" onclick="if(confirm('Clear all data?'))clearAll()">Clear</button></div>
+  </div>
+</div>
+
+<div class="bnav">
+  <div class="nitem on" data-n="dash" onclick="sw('dash',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="nlbl">Home</span></div>
+  <div class="nitem" data-n="log" onclick="sw('log',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg><span class="nlbl">Log</span></div>
+  <div class="nitem" data-n="coach" onclick="sw('coach',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><span class="nlbl">Coach</span></div>
+  <div class="nitem" data-n="progress" onclick="sw('progress',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg><span class="nlbl">Progress</span></div>
+  <div class="nitem" data-n="settings" onclick="sw('settings',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="nlbl">Settings</span></div>
+</div>
+
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const GOAL_CFG={hypertrophy:{label:'Hypertrophy',repMin:8,repMax:15,rest:90,ol:2.5},strength:{label:'Strength',repMin:3,repMax:6,rest:180,ol:5},recomp:{label:'Recomp',repMin:8,repMax:12,rest:90,ol:2.5}};
+const MVOLS={Chest:{mev:8,mav:16,mrv:22},Back:{mev:10,mav:18,mrv:25},Quads:{mev:8,mav:16,mrv:20},Shoulders:{mev:6,mav:14,mrv:20},Biceps:{mev:6,mav:14,mrv:20},Triceps:{mev:6,mav:14,mrv:18}};
+const EMMAP={'Bench press':'Chest','Incline DB press':'Chest','Cable fly':'Chest','OHP (barbell)':'Shoulders','Lateral raise':'Shoulders','Face pulls':'Shoulders','Barbell row':'Back','Cable row':'Back','Pull-up (weighted)':'Back','Squat (barbell)':'Quads','Leg press':'Quads','Bulgarian split squat':'Quads','Barbell curl':'Biceps','Tricep pushdown':'Triceps','Romanian deadlift':'Back','Leg curl (machine)':'Hamstrings'};
+const DEF_EX=[{name:'Bench press',muscle:'Chest',type:'Barbell',custom:false},{name:'Incline DB press',muscle:'Chest',type:'Dumbbell',custom:false},{name:'Cable fly',muscle:'Chest',type:'Cable',custom:false},{name:'OHP (barbell)',muscle:'Shoulders',type:'Barbell',custom:false},{name:'Lateral raise',muscle:'Shoulders',type:'Dumbbell',custom:false},{name:'Face pulls',muscle:'Shoulders',type:'Cable',custom:false},{name:'Pull-up (weighted)',muscle:'Back',type:'Bodyweight',custom:false},{name:'Barbell row',muscle:'Back',type:'Barbell',custom:false},{name:'Cable row',muscle:'Back',type:'Cable',custom:false},{name:'Barbell curl',muscle:'Biceps',type:'Barbell',custom:false},{name:'Tricep pushdown',muscle:'Triceps',type:'Cable',custom:false},{name:'Squat (barbell)',muscle:'Quads',type:'Barbell',custom:false},{name:'Leg press',muscle:'Quads',type:'Machine',custom:false},{name:'Bulgarian split squat',muscle:'Quads',type:'Dumbbell',custom:false},{name:'Romanian deadlift',muscle:'Hamstrings',type:'Barbell',custom:false},{name:'Leg curl (machine)',muscle:'Hamstrings',type:'Machine',custom:false}];
+const TEMPLATES=[
+  {id:'push-a',name:'Push A — Chest & Shoulders',muscles:['Chest','Delts','Triceps'],compound:'Bench press',exercises:[{name:'Bench press',sets:4,reps:8,kg:90},{name:'Incline DB press',sets:3,reps:10,kg:28},{name:'Cable fly',sets:3,reps:12,kg:18},{name:'OHP (barbell)',sets:3,reps:8,kg:60},{name:'Lateral raise',sets:4,reps:15,kg:12},{name:'Tricep pushdown',sets:3,reps:12,kg:32}]},
+  {id:'pull-a',name:'Pull A — Back & Biceps',muscles:['Lats','Rear delts','Biceps'],compound:'Pull-up (weighted)',exercises:[{name:'Pull-up (weighted)',sets:4,reps:6,kg:10},{name:'Barbell row',sets:4,reps:8,kg:80},{name:'Cable row',sets:3,reps:12,kg:57},{name:'Face pulls',sets:3,reps:15,kg:20},{name:'Barbell curl',sets:3,reps:10,kg:37}]},
+  {id:'legs-a',name:'Legs A — Quads & Glutes',muscles:['Quads','Glutes','Hamstrings'],compound:'Squat (barbell)',exercises:[{name:'Squat (barbell)',sets:4,reps:6,kg:115},{name:'Romanian deadlift',sets:3,reps:10,kg:87},{name:'Leg press',sets:3,reps:12,kg:135},{name:'Bulgarian split squat',sets:3,reps:10,kg:22},{name:'Leg curl (machine)',sets:3,reps:12,kg:45}]},
+  {id:'upper-a',name:'Upper A — Full upper body',muscles:['Chest','Back','Shoulders'],compound:'Bench press',exercises:[{name:'Bench press',sets:4,reps:5,kg:92},{name:'Barbell row',sets:4,reps:6,kg:80},{name:'OHP (barbell)',sets:3,reps:8,kg:60},{name:'Pull-up (weighted)',sets:3,reps:6,kg:10},{name:'Incline DB press',sets:3,reps:10,kg:28},{name:'Lateral raise',sets:3,reps:15,kg:12}]}
+];
+let DB={sessions:[],split:'PPL',streak:0,lastDate:null,goal:'hypertrophy',profile:{level:'intermediate',days:4,equipment:'full'},exercises:[...DEF_EX],measurements:[]};
+let obA=[null,null,null,null],selTpl=null,coachTplIdx=null,coachExIdx=0,coachSetIdx=0;
+let tInt=null,tRem=0,tTot=0,tRun=false;
+let ctInt=null,ctRem=0,ctTot=0,ctRun=false;
+let activeMF='',volCI=null,bodyCI=null;
+
+function loadDB(){try{const r=localStorage.getItem('hc_v5');if(r){DB=JSON.parse(r);if(!DB.exercises)DB.exercises=[...DEF_EX];if(!DB.measurements)DB.measurements=[];}}catch(e){}}
+function saveDB(){try{localStorage.setItem('hc_v5',JSON.stringify(DB));}catch(e){}}
+function clearAll(){DB={sessions:[],split:'PPL',streak:0,lastDate:null,goal:'hypertrophy',profile:DB.profile,exercises:[...DEF_EX],measurements:[]};saveDB();renderDash();renderProgress();renderHistory();renderMeasHist();toast('All data cleared');}
+
+const lvlMap=['beginner','intermediate','advanced'],daysMap=[3,4,6],goalMap=['hypertrophy','strength','recomp'],equipMap=['full','home','bodyweight'];
+function obSel(s,i,el){obA[s]=i;el.closest('.ob-opts').querySelectorAll('.ob-opt').forEach(b=>b.classList.remove('sel'));el.classList.add('sel');}
+function obNext(s){if(obA[s]===null){toast('Make a selection first');return;}document.getElementById('obs'+s).style.display='none';document.getElementById('obs'+(s+1)).style.display='flex';document.getElementById('od'+s).classList.add('done');}
+function obBack(s){document.getElementById('obs'+s).style.display='none';document.getElementById('obs'+(s-1)).style.display='flex';}
+function obFinish(){if(obA[3]===null){toast('Make a selection');return;}DB.profile={level:lvlMap[obA[0]||1],days:daysMap[obA[1]||1],equipment:equipMap[obA[3]||0]};DB.goal=goalMap[obA[2]||0];saveDB();document.getElementById('onboarding').style.display='none';document.getElementById('mainApp').style.display='block';initApp();}
+
+function sw(name,el){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('vis'));
+  document.getElementById('tab-'+name).classList.add('vis');
+  document.querySelectorAll('.tab,.nitem').forEach(t=>t.classList.remove('on'));
+  const t=document.querySelector('.tab[data-t="'+name+'"]');if(t)t.classList.add('on');
+  if(el&&el.dataset){if(el.dataset.n)el.classList.add('on');else{const ni=document.querySelector('.nitem[data-n="'+name+'"]');if(ni)ni.classList.add('on');}}
+  if(name==='dash')renderDash();
+  if(name==='progress')renderProgress();
+  if(name==='history')renderHistory();
+  if(name==='library')renderLib();
+  if(name==='body'){renderMeasHist();renderBodyChart();}
+  if(name==='settings')renderSettings();
+  if(name==='coach')renderCoach();
+}
+
+function renderGoalBar(){document.getElementById('goalBar').innerHTML=Object.entries(GOAL_CFG).map(([k,v])=>`<span class="pill ${DB.goal===k?'on':''}" onclick="setGoal('${k}')">${v.label}</span>`).join('');document.getElementById('goalBadge').textContent=GOAL_CFG[DB.goal].label;}
+function setGoal(g){DB.goal=g;saveDB();renderGoalBar();renderDash();toast(GOAL_CFG[g].label+' mode active');}
+
+function buildTplList(){document.getElementById('tplList').innerHTML=TEMPLATES.map((t,i)=>`<div class="card" style="cursor:pointer" id="tc${i}" onclick="selTpl(${i})"><div class="card-row"><span class="card-title">${t.name}</span><span class="badge bb">${t.exercises.length} ex</span></div><div class="card-sub">${t.muscles.join(' · ')}</div></div>`).join('');}
+
+function selTpl(idx){
+  selTpl=idx;coachTplIdx=idx;coachExIdx=0;coachSetIdx=0;
+  document.querySelectorAll('[id^="tc"]').forEach((c,i)=>{c.style.border=i===idx?'1.5px solid var(--mid)':'0.5px solid var(--border2)';c.style.background=i===idx?'var(--powder-xlt)':'var(--surface)';});
+  const t=TEMPLATES[idx],gc=GOAL_CFG[DB.goal],prev=prevSess(t.id);
+  document.getElementById('logTitle').textContent=t.name;
+  document.getElementById('lastSess').textContent=prev?'Last logged '+daysSince(prev.date)+' days ago':'First time — focus on form';
+  renderWarmup(t,prev);
+  document.getElementById('exRows').innerHTML=t.exercises.map((ex,i)=>{const p=prev?prev.exercises[i]:null,kg=p?nextKg(p):ex.kg,reps=p?p.reps:Math.min(ex.reps,gc.repMax);return `<div class="ex-grid"><div class="ex-name">${ex.name}</div><input type="number" class="inp inp-c" value="${ex.sets}" min="1" max="10" id="s${i}"><input type="number" class="inp inp-c" value="${reps}" min="1" max="50" id="r${i}"><input type="number" class="inp inp-c" value="${(+kg).toFixed(1)}" min="0" max="500" step="2.5" id="k${i}"><select class="inp inp-c" id="rir${i}"><option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option></select></div>`;}).join('');
+  renderOLHints(t,prev);
+  document.getElementById('logPanel').style.display='block';
+  document.getElementById('logPanel').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function renderWarmup(t,prev){const ex=t.exercises[0],wkg=prev?prev.exercises[0].kg:ex.kg;document.getElementById('warmupSection').style.display='block';document.getElementById('warmupSets').innerHTML=`<div style="font-size:12px;color:var(--ink3);margin-bottom:7px">Working up to ${wkg} kg on ${ex.name}</div><div style="display:flex;flex-wrap:wrap">${[{p:.4,r:10},{p:.6,r:5},{p:.8,r:3},{p:.9,r:1}].map(w=>`<span class="warm-chip">${(wkg*w.p).toFixed(1)} kg × ${w.r}</span>`).join('')}</div>`;}
+
+function renderOLHints(t,prev){const el=document.getElementById('olHints');if(!prev){el.innerHTML=`<div style="display:flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--mid);background:var(--powder-xlt);padding:9px 12px;border-radius:var(--r8);border:0.5px solid var(--powder)"><div style="width:5px;height:5px;border-radius:50%;background:var(--mid);flex-shrink:0;margin-top:4px"></div>Starting weights loaded — focus on form this session</div>`;return;}el.innerHTML=t.exercises.slice(0,2).map((ex,i)=>{const p=prev.exercises[i];if(!p)return '';if(p.rir===0)return `<div style="display:flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--success);background:var(--success-bg);padding:9px 12px;border-radius:var(--r8);border:0.5px solid var(--success-border);margin-top:6px"><div style="width:5px;height:5px;border-radius:50%;background:var(--success);flex-shrink:0;margin-top:4px"></div>${ex.name} — maxed out last session, 2.5 kg added</div>`;if(p.rir>=3)return `<div style="display:flex;align-items:flex-start;gap:6px;font-size:12px;color:var(--warning);background:var(--warning-bg);padding:9px 12px;border-radius:var(--r8);border:0.5px solid var(--warning-border);margin-top:6px"><div style="width:5px;height:5px;border-radius:50%;background:var(--warning);flex-shrink:0;margin-top:4px"></div>${ex.name} — felt easy last time (RIR ${p.rir}), push harder today</div>`;return '';}).join('');}
+
+function nextKg(p){if(p.rir===0)return p.kg+2.5;if(p.rir>=3)return Math.max(p.kg-2.5,0);return p.kg;}
+function prevSess(id){const m=DB.sessions.filter(s=>s.id===id);return m.length?m[m.length-1]:null;}
+function daysSince(iso){return Math.max(0,Math.floor((Date.now()-new Date(iso).getTime())/86400000));}
+
+function saveSession(){if(selTpl===null){toast('Select a template first');return;}const t=TEMPLATES[selTpl];const exercises=t.exercises.map((ex,i)=>({name:ex.name,sets:parseInt(document.getElementById('s'+i).value)||ex.sets,reps:parseInt(document.getElementById('r'+i).value)||ex.reps,kg:parseFloat(document.getElementById('k'+i).value)||ex.kg,rir:parseInt(document.getElementById('rir'+i).value)}));DB.sessions.push({id:t.id,name:t.name,date:new Date().toISOString(),goal:DB.goal,exercises});updateStreak();saveDB();toast('Session saved — great work!');document.getElementById('logPanel').style.display='none';document.querySelectorAll('[id^="tc"]').forEach(c=>{c.style.border='0.5px solid var(--border2)';c.style.background='var(--surface)';});selTpl=null;coachTplIdx=null;stopTimer();renderDash();}
+function updateStreak(){const today=new Date().toDateString();if(DB.lastDate===today)return;DB.streak=(DB.lastDate===new Date(Date.now()-86400000).toDateString())?(DB.streak||0)+1:1;DB.lastDate=today;}
+
+function renderCoach(){if(coachTplIdx===null){document.getElementById('coachEmpty').style.display='block';document.getElementById('coachActive').style.display='none';return;}document.getElementById('coachEmpty').style.display='none';document.getElementById('coachActive').style.display='block';const t=TEMPLATES[coachTplIdx];document.getElementById('coachSessName').textContent=t.name+' — '+GOAL_CFG[DB.goal].label;document.getElementById('coachProgTxt').textContent='Exercise '+(coachExIdx+1)+' of '+t.exercises.length;document.getElementById('coachNav').innerHTML=t.exercises.map((ex,i)=>`<span class="badge ${i===coachExIdx?'bb':'bn'}" style="cursor:pointer;opacity:${i===coachExIdx?1:.65}" onclick="jumpEx(${i})">${i+1}</span>`).join('');renderCoachEx();}
+function renderCoachEx(){const t=TEMPLATES[coachTplIdx],ex=t.exercises[coachExIdx],prev=prevSess(t.id),p=prev?prev.exercises[coachExIdx]:null,kg=p?nextKg(p):ex.kg;document.getElementById('coachExName').textContent=ex.name;document.getElementById('coachExSub').textContent=ex.sets+' sets · '+ex.reps+' reps · '+kg.toFixed(1)+' kg';document.getElementById('coachSets').innerHTML=Array.from({length:ex.sets},(_,i)=>`<div class="set-row" id="csr${i}"><div class="set-num ${i===coachSetIdx?'active':i<coachSetIdx?'done':''}">${i<coachSetIdx?'✓':(i+1)}</div><div class="set-info"><div class="set-detail">${kg.toFixed(1)} kg × ${ex.reps} reps</div><div class="set-sub">RIR target: ${i===ex.sets-1?'0–1':'1–2'}</div></div><div class="set-tag">${i===coachSetIdx?'→ now':i<coachSetIdx?'done':''}</div></div>`).join('');document.getElementById('coachSets').onclick=e=>{const row=e.target.closest('.set-row');if(!row)return;const i=parseInt(row.id.replace('csr',''));if(i===coachSetIdx){coachSetIdx++;if(coachSetIdx>=ex.sets)coachSetIdx=0;renderCoachEx();startCTimer(GOAL_CFG[DB.goal].rest);}};}
+function jumpEx(i){coachExIdx=i;coachSetIdx=0;renderCoach();}
+function coachNext(){if(coachExIdx<TEMPLATES[coachTplIdx].exercises.length-1){coachExIdx++;coachSetIdx=0;renderCoach();}else toast('Last exercise — tap Finish to save!');}
+function coachPrev(){if(coachExIdx>0){coachExIdx--;coachSetIdx=0;renderCoach();}}
+
+function startTimer(s){stopTimer();tTot=s;tRem=s;tRun=true;document.getElementById('timerWrap').style.display='block';document.getElementById('tGoBtn').textContent='Pause';document.getElementById('tLbl').textContent='Rest — take your time';updT();tInt=setInterval(tickT,1000);}
+function tickT(){if(!tRun)return;tRem--;updT();if(tRem<=0){clearInterval(tInt);document.getElementById('tLbl').textContent='Go!';document.getElementById('tGoBtn').textContent='Done';}}
+function updT(){const m=Math.floor(Math.abs(tRem)/60),s=Math.abs(tRem)%60;document.getElementById('tDisp').textContent=(tRem<0?'-':'')+(tTot>=60?m+':'+(s<10?'0':'')+s:s+'s');document.getElementById('tprogbar').style.width=Math.max(0,tRem/tTot*100)+'%';}
+function toggleTimer(){tRun=!tRun;document.getElementById('tGoBtn').textContent=tRun?'Pause':'Resume';}
+function addTime(s){tRem+=s;updT();}
+function stopTimer(){clearInterval(tInt);tRun=false;document.getElementById('timerWrap').style.display='none';}
+function startCTimer(s){stopCTimer();ctTot=s;ctRem=s;ctRun=true;['ctDisp','ctLbl','ctBtns'].forEach(id=>document.getElementById(id).style.display=id==='ctBtns'?'flex':'block');document.getElementById('ctGoBtn').textContent='Pause';document.getElementById('ctLbl').textContent='Rest — set logged';updCT();ctInt=setInterval(tickCT,1000);}
+function tickCT(){if(!ctRun)return;ctRem--;updCT();if(ctRem<=0){clearInterval(ctInt);document.getElementById('ctLbl').textContent='Go — next set!';document.getElementById('ctGoBtn').textContent='Done';}}
+function updCT(){const m=Math.floor(Math.abs(ctRem)/60),s=Math.abs(ctRem)%60;document.getElementById('ctDisp').textContent=(ctRem<0?'-':'')+(ctTot>=60?m+':'+(s<10?'0':'')+s:s+'s');document.getElementById('ctprogbar').style.width=Math.max(0,ctRem/ctTot*100)+'%';}
+function toggleCTimer(){ctRun=!ctRun;document.getElementById('ctGoBtn').textContent=ctRun?'Pause':'Resume';}
+function addCTime(s){ctRem+=s;updCT();}
+function stopCTimer(){clearInterval(ctInt);ctRun=false;['ctDisp','ctLbl','ctBtns'].forEach(id=>document.getElementById(id).style.display='none');}
+
+function renderDash(){renderGoalBar();const s=DB.sessions,wk=Date.now()-7*86400000,tw=s.filter(x=>new Date(x.date).getTime()>wk);const wsets=tw.reduce((a,x)=>a+x.exercises.reduce((b,e)=>b+e.sets,0),0);document.getElementById('d-vol').textContent=wsets;document.getElementById('d-vold').textContent=tw.length+' sessions this week';document.getElementById('d-sess').textContent=s.length;document.getElementById('d-sessd').textContent=s.length?'All time':'Log your first session';document.getElementById('d-streak').innerHTML=(DB.streak||0)+'<span class="stat-unit">d</span>';document.getElementById('streakTxt').textContent=(DB.streak||0)+'d';const bs=s.flatMap(x=>x.exercises.filter(e=>e.name==='Bench press'));if(bs.length){const best=bs.reduce((a,b)=>b.kg>a.kg?b:a);document.getElementById('d-bench').innerHTML=best.kg+'<span class="stat-unit">kg</span>';if(bs.length>1){const p2=bs[bs.length-2];document.getElementById('d-benchd').textContent=(best.kg>=p2.kg?'+':'')+(best.kg-p2.kg).toFixed(1)+' kg from last';}}renderAlerts(s);renderPR(s);renderOLTargets(s);renderVolLand(s);}
+function renderAlerts(s){const el=document.getElementById('alerts');const al=[];if(s.length>=4){const l4=s.slice(-4);let drops=0;for(let i=1;i<l4.length;i++){const avg=x=>x.exercises.reduce((a,e)=>a+e.kg,0)/x.exercises.length;if(avg(l4[i])<avg(l4[i-1]))drops++;}if(drops>=2)al.push({type:'w',title:'Deload week recommended',body:'Average weights dropped across '+drops+' of your last 4 sessions. Reduce volume 40–50% this week.'});}if(s.length>=2){const wk=Date.now()-7*86400000,tw=s.filter(x=>new Date(x.date).getTime()>wk);const push=tw.reduce((a,x)=>a+x.exercises.filter(e=>['Bench press','Incline DB press','Cable fly','OHP (barbell)'].includes(e.name)).reduce((b,e)=>b+e.sets,0),0);const pull=tw.reduce((a,x)=>a+x.exercises.filter(e=>['Barbell row','Cable row','Pull-up (weighted)','Face pulls'].includes(e.name)).reduce((b,e)=>b+e.sets,0),0);if(push>0&&pull>0&&push/pull>2)al.push({type:'d',title:'Muscle imbalance warning',body:`Push:pull ratio is ${push}:${pull} this week. Aim for 1:1 to protect shoulder health.`});}const plat=s.length>=3?['Bench press','Squat (barbell)','Barbell row'].reduce((acc,lift)=>{const d=s.flatMap(x=>x.exercises.filter(e=>e.name===lift).map(e=>e.kg)).slice(-4);if(d.length>=3&&d.every(v=>v===d[0]))acc.push({name:lift,n:d.length});return acc;},[]):[];if(plat.length)al.push({type:'w',title:'Plateau detected',body:plat[0].name+' has not progressed in '+plat[0].n+' sessions. Try a rep range change or deload.'});el.innerHTML=al.map(a=>`<div class="card alert-${a.type}" style="margin-bottom:10px"><div class="alert-title at-${a.type}">${a.title}</div><div class="alert-body ab-${a.type}">${a.body}</div></div>`).join('');}
+function renderPR(s){const el=document.getElementById('prBanner');if(s.length<2){el.innerHTML='';return;}const last=s[s.length-1],prev=s.slice(0,-1);let pr='';last.exercises.forEach(ex=>{const pm=prev.flatMap(x=>x.exercises.filter(e=>e.name===ex.name)).map(e=>e.kg);if(pm.length&&ex.kg>Math.max(...pm))pr=`${ex.name} — ${ex.kg} kg (+${(ex.kg-Math.max(...pm)).toFixed(1)} kg)`;});el.innerHTML=pr?`<div class="pr-banner"><div class="pr-star"><svg width="16" height="16" viewBox="0 0 16 16" fill="white"><path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4L8 10l-3.6 1.9.7-4L2.2 5.2l4-.6z"/></svg></div><div class="pr-text"><strong>New personal record</strong>${pr}</div></div>`:'';};
+function renderOLTargets(s){const el=document.getElementById('olCard');if(!s.length){el.innerHTML='<div style="font-size:13px;color:var(--ink3)">Log a session to see overload targets.</div>';return;}const last=s[s.length-1];el.innerHTML=last.exercises.slice(0,3).map(ex=>{const nk=ex.rir<=1?ex.kg+2.5:ex.kg,pct=Math.min(100,ex.rir<=1?100:60);const color=pct>=100?'#005b96':pct>=60?'#6497b1':'#7a4e0d';return `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:13px;color:var(--navy);font-weight:500">${ex.name}</span><span style="font-size:12px;color:var(--ink3)">${ex.kg} → <strong style="color:var(--navy)">${(+nk).toFixed(1)} kg</strong></span></div><div class="prog-bg"><div class="prog-bar" style="width:${pct}%;background:${color}"></div></div></div>`;}).join('');}
+function renderVolLand(s){const el=document.getElementById('volCard');if(!s.length){el.innerHTML='<div style="font-size:13px;color:var(--ink3)">Log a session to see volume.</div>';return;}const wk=Date.now()-7*86400000,tw=s.filter(x=>new Date(x.date).getTime()>wk),counts={};tw.forEach(x=>x.exercises.forEach(e=>{const m=EMMAP[e.name];if(m)counts[m]=(counts[m]||0)+e.sets;}));el.innerHTML=Object.keys(MVOLS).map(m=>{const sets=counts[m]||0,{mrv,mav,mev}=MVOLS[m],pct=Math.min(100,Math.round(sets/mrv*100));const color=sets>=mrv?'#8b1a1a':sets>=mav?'#7a4e0d':sets>=mev?'#005b96':'#6497b1';return `<div class="vol-row"><div class="vol-name">${m}</div><div class="vol-bg"><div class="vol-bar" style="width:${pct}%;background:${color}"></div></div><div class="vol-val">${sets}/${mrv}</div></div>`;}).join('');}
+
+function renderHistory(){const el=document.getElementById('histList');if(!DB.sessions.length){el.innerHTML='<div style="padding:14px 0;font-size:13px;color:var(--ink3)">No sessions logged yet.</div>';return;}el.innerHTML=[...DB.sessions].reverse().map((s,ri)=>{const i=DB.sessions.length-1-ri,d=new Date(s.date);return `<div class="hist-item" onclick="toggleHist(${i})"><div class="hist-head"><span class="hist-name">${s.name}</span><span class="hist-date">${d.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})}</span></div><div class="hist-meta">${s.exercises.reduce((a,e)=>a+e.sets,0)} sets · ${s.exercises.length} exercises · ${s.goal||'hypertrophy'}</div><div class="hist-detail" id="hd${i}">${s.exercises.map(e=>`<div class="hist-ex"><span class="hist-ex-name">${e.name}</span><span class="hist-ex-val">${e.sets}×${e.reps} @ ${e.kg} kg</span></div>`).join('')}</div></div>`;}).join('');}
+function toggleHist(i){document.getElementById('hd'+i).classList.toggle('open');}
+function exportCSV(){if(!DB.sessions.length){toast('No sessions to export');return;}const rows=['Date,Session,Exercise,Sets,Reps,Weight (kg),RIR'];DB.sessions.forEach(s=>{const d=new Date(s.date).toLocaleDateString('en-AU');s.exercises.forEach(e=>rows.push([d,s.name,e.name,e.sets,e.reps,e.kg,e.rir].join(',')))});const blob=new Blob([rows.join('\n')],{type:'text/csv'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='hypercoach.csv';a.click();URL.revokeObjectURL(url);toast('CSV exported!');}
+
+function saveMeas(){const m={date:new Date().toISOString(),bw:parseFloat(document.getElementById('mBw').value)||null,bf:parseFloat(document.getElementById('mBf').value)||null,chest:parseFloat(document.getElementById('mChest').value)||null,waist:parseFloat(document.getElementById('mWaist').value)||null,arms:parseFloat(document.getElementById('mArms').value)||null,legs:parseFloat(document.getElementById('mLegs').value)||null};if(!m.bw&&!m.chest){toast('Enter at least one measurement');return;}DB.measurements.push(m);saveDB();renderMeasHist();renderBodyChart();toast('Measurements saved!');['mBw','mBf','mChest','mWaist','mArms','mLegs'].forEach(id=>document.getElementById(id).value='');}
+function renderMeasHist(){const el=document.getElementById('measHist');if(!DB.measurements.length){el.innerHTML='<div style="padding:12px 0;font-size:13px;color:var(--ink3)">No measurements yet.</div>';return;}el.innerHTML=[...DB.measurements].reverse().map(m=>{const d=new Date(m.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'});const parts=[];if(m.bw)parts.push(m.bw+'kg');if(m.bf)parts.push(m.bf+'% BF');if(m.chest)parts.push('Chest '+m.chest);if(m.arms)parts.push('Arms '+m.arms);return `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:0.5px solid var(--border)"><span style="font-size:13px;font-weight:600;color:var(--navy)">${d}</span><span style="font-size:12px;color:var(--ink3)">${parts.join(' · ')}</span></div>`;}).join('');}
+function renderBodyChart(){const data=DB.measurements.filter(m=>m.bw).slice(-12);if(bodyCI)bodyCI.destroy();bodyCI=new Chart(document.getElementById('bodyChart'),{type:'line',data:{labels:data.map(m=>new Date(m.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'})),datasets:[{label:'Bodyweight',data:data.map(m=>m.bw),borderColor:'#005b96',backgroundColor:'#005b9618',tension:.3,pointRadius:3,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(1,31,75,0.06)'},ticks:{color:'#6497b1',font:{size:11}}},x:{grid:{display:false},ticks:{color:'#6497b1',font:{size:10},maxRotation:40}}}}});}
+
+function renderProgress(){const s=DB.sessions;document.getElementById('liftHist').innerHTML=['Bench press','Squat (barbell)','Barbell row','OHP (barbell)'].map(lift=>{const data=s.flatMap(x=>x.exercises.filter(e=>e.name===lift).map(e=>({kg:e.kg,reps:e.reps}))).slice(-8);if(!data.length)return '';const last=data[data.length-1],diff=+(last.kg-data[0].kg).toFixed(1),max=Math.max(...data.map(d=>d.kg));return `<div class="lift-card"><div class="lift-top"><span class="lift-name">${lift}</span><span><span class="lift-val">${last.kg}</span><span class="lift-unit">kg × ${last.reps}</span></span></div><div class="lift-meta">${diff>=0?'+'+diff:diff} kg · next target ${(last.kg+2.5).toFixed(1)} kg</div><div class="mini-chart">${data.map((d,i)=>`<div class="mbar ${i===data.length-1?'cur':''}" style="height:${Math.max(10,Math.round(d.kg/max*100))}%"></div>`).join('')}</div></div>`;}).filter(Boolean).join('')||'<div class="card"><div style="font-size:13px;color:var(--ink3)">Log sessions to see lift progression.</div></div>';renderVolChart(s);}
+function renderVolChart(s){const months=[];for(let i=5;i>=0;i--){const d=new Date();d.setMonth(d.getMonth()-i);months.push({lbl:d.toLocaleString('default',{month:'short'}),yr:d.getFullYear(),mo:d.getMonth()});}const muscles=['Chest','Back','Quads','Shoulders'],colors=['#011f4b','#005b96','#6497b1','#b3cde0'];document.getElementById('chartLeg').innerHTML=muscles.map((m,i)=>`<span style="display:flex;align-items:center;gap:4px"><span style="width:9px;height:9px;border-radius:2px;background:${colors[i]}"></span>${m}</span>`).join('');if(volCI)volCI.destroy();volCI=new Chart(document.getElementById('volChart'),{type:'line',data:{labels:months.map(m=>m.lbl),datasets:muscles.map((m,mi)=>({label:m,data:months.map(mo=>s.filter(x=>{const d=new Date(x.date);return d.getMonth()===mo.mo&&d.getFullYear()===mo.yr;}).reduce((a,x)=>a+x.exercises.filter(e=>EMMAP[e.name]===m).reduce((b,e)=>b+e.sets,0),0)),borderColor:colors[mi],backgroundColor:colors[mi]+'18',tension:.35,pointRadius:3,fill:false}))},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,grid:{color:'rgba(1,31,75,0.06)'},ticks:{color:'#6497b1',font:{size:11}}},x:{grid:{display:false},ticks:{color:'#6497b1',font:{size:11}}}}}});}
+
+function renderLib(){const muscles=[...new Set(DB.exercises.map(e=>e.muscle))].sort();document.getElementById('muscleFilter').innerHTML=`<span class="pill ${activeMF===''?'on':''}" onclick="setMF('')">All</span>`+muscles.map(m=>`<span class="pill ${activeMF===m?'on':''}" onclick="setMF('${m}')">${m}</span>`).join('');const q=(document.getElementById('exSearch').value||'').toLowerCase();const fil=DB.exercises.filter(e=>(activeMF===''||e.muscle===activeMF)&&e.name.toLowerCase().includes(q));document.getElementById('exList').innerHTML=fil.length?fil.map(e=>`<div class="lib-item"><div><div class="lib-name">${e.name}</div><div class="lib-sub">${e.muscle} · ${e.type}</div></div>${e.custom?`<button class="btn sm danger-btn" style="padding:6px 10px;font-size:11px;margin:0" onclick="delEx('${e.name}')">Remove</button>`:'<span class="badge bn">Built-in</span>'}</div>`).join(''):'<div style="padding:14px 0;font-size:13px;color:var(--ink3)">No exercises found.</div>';}
+function setMF(m){activeMF=m;renderLib();}
+function toggleAddEx(){document.getElementById('addExForm').style.display=document.getElementById('addExForm').style.display==='none'?'block':'none';}
+function addEx(){const name=document.getElementById('nxName').value.trim(),muscle=document.getElementById('nxMus').value,type=document.getElementById('nxType').value;if(!name||!muscle||!type){toast('Fill all fields');return;}DB.exercises.push({name,muscle,type,custom:true});saveDB();document.getElementById('addExForm').style.display='none';document.getElementById('nxName').value='';renderLib();toast('Exercise added!');}
+function delEx(name){DB.exercises=DB.exercises.filter(e=>e.name!==name);saveDB();renderLib();}
+function calcRM(){const kg=parseFloat(document.getElementById('rmKg').value),reps=parseInt(document.getElementById('rmReps').value),rir=parseInt(document.getElementById('rmRir').value);if(!kg||!reps)return;const orm=+(kg*(1+(reps+rir)/30)).toFixed(1);document.getElementById('rmVal').textContent=orm+' kg';document.getElementById('rmGrid').innerHTML=[100,95,90,85,80,75,70,65].map(p=>`<div class="rm-cell"><div class="rm-pct">${p}%</div><div class="rm-kg">${(orm*p/100).toFixed(1)} kg</div></div>`).join('');document.getElementById('rmResult').style.display='block';}
+
+function renderSettings(){const p=DB.profile;document.getElementById('sLvlSub').textContent=p.level;document.getElementById('sLvl').value=p.level;document.getElementById('sDays').value=p.days;document.getElementById('sEquip').value=p.equipment;const rec={beginner:'Full Body',intermediate:p.days>=5?'PPL':'Upper/Lower',advanced:'PPL'}[p.level]||'PPL';const desc={PPL:'PPL gives you maximum weekly muscle frequency for your experience and schedule.','Upper/Lower':'Upper/Lower hits each muscle twice per week — ideal balance for 4 days.','Full Body':'Full body 3× per week maximises stimulus frequency at your level.'}[rec];document.getElementById('splitRec').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><span style="font-size:15px;font-weight:600;color:var(--navy)">${rec} recommended</span><span class="badge bb">For you</span></div><div style="font-size:13px;color:var(--dark);line-height:1.5">${desc}</div>`;}
+function updSet(key,val){DB.profile[key]=val;saveDB();renderSettings();toast('Settings updated');}
+
+let toastT;
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),2600);}
+
+function initApp(){buildTplList();renderDash();renderSettings();}
+
+loadDB();
+if(DB.sessions.length>0||(DB.profile&&DB.profile.level)){
+  document.getElementById('onboarding').style.display='none';
+  document.getElementById('mainApp').style.display='block';
+  initApp();
+}
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/sw.js').then(reg=>{
+      console.log('SW registered');
+    }).catch(err=>{
+      console.log('SW registration failed:',err);
+    });
+  });
+}
+</script>
+</body>
+</html>
