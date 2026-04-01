@@ -102,7 +102,7 @@ body{
 /* Buttons */
 .btn{width:100%;padding:13px;border-radius:var(--rpill);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s;border:none;margin-top:10px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
 .btn.pri{background:var(--navy);color:#fff}
-.btn.sec{background:transparent;border:0.5px solid var(--border2);color:var(--navy);margin-top:8px}
+.btn.btn-o{background:transparent;border:0.5px solid var(--border2);color:var(--navy);margin-top:8px}
 .btn.brand{background:var(--mid);color:#fff}
 .btn.ghost{background:var(--surface2);color:var(--ink2);margin-top:8px}
 .btn.danger-btn{background:var(--danger-bg);color:var(--danger);border:0.5px solid var(--danger-border);margin-top:8px}
@@ -341,7 +341,7 @@ input[type=number]{-moz-appearance:textfield}
       <button class="ob-opt" onclick="obSel(1,1,this)"><div class="ob-opt-title">4 days</div><div class="ob-opt-sub">Upper / Lower split</div></button>
       <button class="ob-opt" onclick="obSel(1,2,this)"><div class="ob-opt-title">5–6 days</div><div class="ob-opt-sub">PPL — maximum volume potential</div></button>
     </div>
-    <div class="ob-nav"><button class="btn sec" onclick="obBack(1)">Back</button><button class="btn pri" onclick="obNext(1)">Next</button></div>
+    <div class="ob-nav"><button class="btn btn-o" onclick="obBack(1)">Back</button><button class="btn pri" onclick="obNext(1)">Next</button></div>
   </div>
   <div id="obs2" style="display:none;flex-direction:column;flex:1">
     <div class="ob-q">Primary goal?</div>
@@ -351,7 +351,7 @@ input[type=number]{-moz-appearance:textfield}
       <button class="ob-opt" onclick="obSel(2,1,this)"><div class="ob-opt-title">Strength</div><div class="ob-opt-sub">Maximise lifts — 3–6 reps, heavy load</div></button>
       <button class="ob-opt" onclick="obSel(2,2,this)"><div class="ob-opt-title">Recomp</div><div class="ob-opt-sub">Build muscle while leaning out — 8–12 reps</div></button>
     </div>
-    <div class="ob-nav"><button class="btn sec" onclick="obBack(2)">Back</button><button class="btn pri" onclick="obNext(2)">Next</button></div>
+    <div class="ob-nav"><button class="btn btn-o" onclick="obBack(2)">Back</button><button class="btn pri" onclick="obNext(2)">Next</button></div>
   </div>
   <div id="obs3" style="display:none;flex-direction:column;flex:1">
     <div class="ob-q">Equipment available?</div>
@@ -361,7 +361,7 @@ input[type=number]{-moz-appearance:textfield}
       <button class="ob-opt" onclick="obSel(3,1,this)"><div class="ob-opt-title">Home gym</div><div class="ob-opt-sub">Barbells / dumbbells, limited machines</div></button>
       <button class="ob-opt" onclick="obSel(3,2,this)"><div class="ob-opt-title">Bodyweight only</div><div class="ob-opt-sub">No equipment — calisthenics focus</div></button>
     </div>
-    <div class="ob-nav"><button class="btn sec" onclick="obBack(3)">Back</button><button class="btn brand" onclick="obFinish()">Get started</button></div>
+    <div class="ob-nav"><button class="btn btn-o" onclick="obBack(3)">Back</button><button class="btn brand" onclick="obFinish()">Get started</button></div>
   </div>
 </div>
 </div>
@@ -409,9 +409,9 @@ input[type=number]{-moz-appearance:textfield}
   <div class="card">
     <div style="font-size:13px;color:var(--ink3);margin-bottom:10px">How are your muscles feeling today?</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn sm sec" onclick="toast('Full intensity — let\'s go!')">Fresh</button>
-      <button class="btn sm sec" onclick="toast('Moderate session recommended.')">A bit sore</button>
-      <button class="btn sm sec" onclick="toast('Rest day — recovery is training too.')">Very sore</button>
+      <button class="btn sm btn-o" onclick="toast('Full intensity — let\'s go!')">Fresh</button>
+      <button class="btn sm btn-o" onclick="toast('Moderate session recommended.')">A bit sore</button>
+      <button class="btn sm btn-o" onclick="toast('Rest day — recovery is training too.')">Very sore</button>
     </div>
   </div>
 </div>
@@ -427,7 +427,7 @@ input[type=number]{-moz-appearance:textfield}
   <div id="builtinTplList"></div>
   <div id="tplBuilder" style="display:none">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-      <button class="btn sm sec" onclick="closeTplBuilder()" style="margin:0;touch-action:manipulation">← Back</button>
+      <button class="btn sm btn-o" onclick="closeTplBuilder()" style="margin:0;touch-action:manipulation">← Back</button>
       <div style="font-size:16px;font-weight:600;color:var(--navy)" id="tplBuilderTitle">New template</div>
     </div>
     <div class="card">
@@ -435,7 +435,7 @@ input[type=number]{-moz-appearance:textfield}
       <input class="inp" id="tplName" placeholder="e.g. Push Day A" style="margin-bottom:14px">
       <div class="sec-lbl" style="margin-bottom:8px">Exercises</div>
       <div id="tplExList"></div>
-      <button class="btn sec" onclick="openExPicker()" style="margin-top:10px;touch-action:manipulation">+ Add exercise</button>
+      <button class="btn btn-o" onclick="openExPicker()" style="margin-top:10px;touch-action:manipulation">+ Add exercise</button>
     </div>
     <button class="btn pri" onclick="saveTpl()" style="touch-action:manipulation">Save template</button>
   </div>
@@ -443,7 +443,7 @@ input[type=number]{-moz-appearance:textfield}
     <div style="background:var(--surface);border-radius:var(--r12);max-height:80vh;display:flex;flex-direction:column;overflow:hidden;margin-top:40px">
       <div style="padding:16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
         <div style="font-size:15px;font-weight:600;color:var(--navy)">Add exercise</div>
-        <button class="btn sm sec" onclick="closeExPicker()" style="margin:0;touch-action:manipulation">Done</button>
+        <button class="btn sm btn-o" onclick="closeExPicker()" style="margin:0;touch-action:manipulation">Done</button>
       </div>
       <div style="padding:12px 16px;border-bottom:0.5px solid var(--border)">
         <input class="inp" id="exPickerSearch" placeholder="Search exercises..." oninput="renderExPicker()" style="border-radius:var(--rpill)">
@@ -464,7 +464,7 @@ input[type=number]{-moz-appearance:textfield}
     <div id="awExercises" style="padding:12px 16px"></div>
     <div id="awTimerBar" style="display:none;position:fixed;bottom:calc(68px + var(--safe-bottom));left:0;right:0;max-width:480px;margin:0 auto;background:var(--navy);padding:10px 16px;z-index:10"><div style="display:flex;align-items:center;gap:12px"><div style="flex:1"><div style="font-size:11px;color:var(--powder);margin-bottom:2px">Rest timer</div><div style="background:rgba(255,255,255,0.2);border-radius:var(--rpill);height:4px;overflow:hidden"><div id="awTimerProg" style="height:4px;background:var(--powder);border-radius:var(--rpill);transition:width 1s linear;width:100%"></div></div></div><div style="font-size:24px;font-weight:700;color:#fff;min-width:52px;text-align:center" id="awTimerDisp">3:00</div><button onclick="awSkipTimer()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;padding:6px 12px;border-radius:var(--rpill);font-size:12px;cursor:pointer;touch-action:manipulation">Skip</button></div></div>
   </div>
-  <div id="startModal" style="display:none;position:fixed;inset:0;background:rgba(1,31,75,0.6);z-index:200;align-items:flex-end;padding:0"><div style="background:var(--surface);border-radius:var(--r20) var(--r20) 0 0;padding:24px 20px calc(24px + var(--safe-bottom));width:100%;max-width:480px;margin:0 auto"><div style="width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px"></div><div style="font-size:20px;font-weight:700;color:var(--navy);margin-bottom:4px" id="startModalTitle"></div><div style="font-size:13px;color:var(--ink3);margin-bottom:6px" id="startModalMeta"></div><div style="font-size:13px;color:var(--ink3);margin-bottom:20px" id="startModalLast"></div><div id="startModalExList" style="margin-bottom:20px"></div><button class="btn brand" style="margin:0;touch-action:manipulation" onclick="confirmStartWorkout()">Start workout</button><button class="btn sec" style="margin-top:8px;touch-action:manipulation" onclick="closeStartModal()">Cancel</button></div></div>
+  <div id="startModal" style="display:none;position:fixed;inset:0;background:rgba(1,31,75,0.6);z-index:200;align-items:flex-end;padding:0"><div style="background:var(--surface);border-radius:var(--r20) var(--r20) 0 0;padding:24px 20px calc(24px + var(--safe-bottom));width:100%;max-width:480px;margin:0 auto"><div style="width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 20px"></div><div style="font-size:20px;font-weight:700;color:var(--navy);margin-bottom:4px" id="startModalTitle"></div><div style="font-size:13px;color:var(--ink3);margin-bottom:6px" id="startModalMeta"></div><div style="font-size:13px;color:var(--ink3);margin-bottom:20px" id="startModalLast"></div><div id="startModalExList" style="margin-bottom:20px"></div><button class="btn brand" style="margin:0;touch-action:manipulation" onclick="confirmStartWorkout()">Start workout</button><button class="btn btn-o" style="margin-top:8px;touch-action:manipulation" onclick="closeStartModal()">Cancel</button></div></div>
   <div id="swapModal" style="display:none;position:fixed;inset:0;background:rgba(1,31,75,0.6);z-index:300;align-items:flex-end;padding:0"><div style="background:var(--surface);border-radius:var(--r20) var(--r20) 0 0;padding:20px 0 calc(20px + var(--safe-bottom));width:100%;max-width:480px;margin:0 auto;max-height:80vh;display:flex;flex-direction:column"><div style="padding:0 20px 14px;border-bottom:0.5px solid var(--border);flex-shrink:0"><div style="width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px"></div><div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:15px;font-weight:700;color:var(--navy)">Swap exercise</div><div style="font-size:12px;color:var(--ink3);margin-top:2px">Replacing: <span id="swapTargetName" style="font-weight:500;color:var(--dark)"></span></div></div><button onclick="closeSwapModal()" style="background:var(--surface2);border:none;color:var(--ink3);padding:6px 12px;border-radius:var(--rpill);font-size:12px;cursor:pointer;touch-action:manipulation">Cancel</button></div><input class="inp" id="swapSearch" placeholder="Search exercises..." oninput="renderSwapList()" style="margin-top:12px;border-radius:var(--rpill)"></div><div style="overflow-y:auto;padding:0 20px" id="swapList"></div></div></div>
 </div>
 
@@ -473,7 +473,7 @@ input[type=number]{-moz-appearance:textfield}
   <div id="coachEmpty" class="card alert-w" style="margin-bottom:0">
     <div class="alert-title at-w">No active session</div>
     <div class="alert-body ab-w" style="margin-bottom:10px">Select a template in Log first, then switch here for focused coaching.</div>
-    <button class="btn sm sec" onclick="sw('log',document.querySelector('[data-t=log]'))">Go to Log</button>
+    <button class="btn sm btn-o" onclick="sw('log',document.querySelector('[data-t=log]'))">Go to Log</button>
   </div>
   <div id="coachActive" style="display:none">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
@@ -497,7 +497,7 @@ input[type=number]{-moz-appearance:textfield}
       </div>
     </div>
     <div class="btn-row">
-      <button class="btn sec" style="margin:0" onclick="coachPrev()">← Previous</button>
+      <button class="btn btn-o" style="margin:0" onclick="coachPrev()">← Previous</button>
       <button class="btn pri" style="margin:0" onclick="coachNext()">Next exercise →</button>
     </div>
   </div>
@@ -507,7 +507,7 @@ input[type=number]{-moz-appearance:textfield}
 <div class="sec" id="tab-history">
   <div class="sec-lbl">Past sessions</div>
   <div class="card" style="padding:0 16px" id="histList"><div style="padding:14px 0;font-size:13px;color:var(--ink3)">No sessions logged yet.</div></div>
-  <button class="btn sec" onclick="exportCSV()">Export as CSV</button>
+  <button class="btn btn-o" onclick="exportCSV()">Export as CSV</button>
 </div>
 
 <!-- PROGRESS -->
@@ -554,7 +554,7 @@ input[type=number]{-moz-appearance:textfield}
 <div class="sec" id="tab-library">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
     <div class="sec-lbl" style="margin-bottom:0">Exercise library</div>
-    <button class="btn sm sec" onclick="toggleAddEx()">+ Add</button>
+    <button class="btn sm btn-o" onclick="toggleAddEx()">+ Add</button>
   </div>
   <div id="addExForm" style="display:none" class="card">
     <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:12px">New exercise</div>
@@ -563,7 +563,7 @@ input[type=number]{-moz-appearance:textfield}
     <select class="inp" id="nxMus" style="margin-bottom:10px"><option value="">Select muscle</option><option>Chest</option><option>Back</option><option>Shoulders</option><option>Quads</option><option>Hamstrings</option><option>Glutes</option><option>Biceps</option><option>Triceps</option><option>Core</option><option>Calves</option></select>
     <div class="inp-lbl">Equipment</div>
     <select class="inp" id="nxType" style="margin-bottom:14px"><option value="">Select equipment</option><option>Barbell</option><option>Dumbbell</option><option>Cable</option><option>Machine</option><option>Bodyweight</option><option>Other</option></select>
-    <div class="btn-row"><button class="btn brand sm" style="flex:1;padding:12px" onclick="addEx()">Save exercise</button><button class="btn sec sm" style="flex:1;padding:12px" onclick="toggleAddEx()">Cancel</button></div>
+    <div class="btn-row"><button class="btn brand sm" style="flex:1;padding:12px" onclick="addEx()">Save exercise</button><button class="btn btn-o sm" style="flex:1;padding:12px" onclick="toggleAddEx()">Cancel</button></div>
   </div>
   <input class="inp" id="exSearch" placeholder="Search exercises..." oninput="renderLib()" style="margin-bottom:10px;border-radius:var(--rpill)">
   <div class="pill-group" id="muscleFilter"></div>
@@ -596,23 +596,23 @@ input[type=number]{-moz-appearance:textfield}
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px"><div class="split-name">Push / Pull / Legs</div><span class="badge bb">5–6 days</span></div>
     <div class="split-desc">Highest frequency per muscle group. Ideal for intermediate to advanced lifters.</div>
     <div class="day-row"><div class="day-lbl">Mon</div><div>Push A</div></div><div class="day-row"><div class="day-lbl">Tue</div><div>Pull A</div></div><div class="day-row"><div class="day-lbl">Wed</div><div>Legs A</div></div><div class="day-row"><div class="day-lbl">Thu</div><div>Push B</div></div><div class="day-row"><div class="day-lbl">Fri</div><div>Pull B</div></div><div class="day-row"><div class="day-lbl">Sat</div><div>Legs B</div></div><div class="day-row"><div class="day-lbl">Sun</div><div class="day-rest">Rest</div></div>
-    <button class="btn sec" onclick="DB.split='PPL';saveDB();toast('PPL activated')">Use this split</button>
+    <button class="btn btn-o" onclick="DB.split='PPL';saveDB();toast('PPL activated')">Use this split</button>
   </div>
   <div class="split-card">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px"><div class="split-name">Upper / Lower</div><span class="badge bs">4 days</span></div>
     <div class="split-desc">Each muscle hit twice per week with full recovery between sessions.</div>
     <div class="day-row"><div class="day-lbl">Mon</div><div>Upper A</div></div><div class="day-row"><div class="day-lbl">Tue</div><div>Lower A</div></div><div class="day-row"><div class="day-lbl">Thu</div><div>Upper B</div></div><div class="day-row"><div class="day-lbl">Fri</div><div>Lower B</div></div><div class="day-row"><div class="day-lbl">Rest</div><div class="day-rest">Wed / Sat / Sun</div></div>
-    <button class="btn sec" onclick="DB.split='Upper/Lower';saveDB();toast('Upper/Lower activated')">Use this split</button>
+    <button class="btn btn-o" onclick="DB.split='Upper/Lower';saveDB();toast('Upper/Lower activated')">Use this split</button>
   </div>
   <div class="split-card">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px"><div class="split-name">Full body (3-day)</div><span class="badge bn">3 days</span></div>
     <div class="split-desc">Maximum frequency per session. Best for beginners or limited schedules.</div>
     <div class="day-row"><div class="day-lbl">Mon</div><div>Full body A</div></div><div class="day-row"><div class="day-lbl">Wed</div><div>Full body B</div></div><div class="day-row"><div class="day-lbl">Fri</div><div>Full body C</div></div>
-    <button class="btn sec" onclick="DB.split='Full Body';saveDB();toast('Full Body activated')">Use this split</button>
+    <button class="btn btn-o" onclick="DB.split='Full Body';saveDB();toast('Full Body activated')">Use this split</button>
   </div>
   <div class="sec-lbl" style="margin-top:4px">Data</div>
   <div class="card" style="padding:0 16px">
-    <div class="setting-row"><div><div class="setting-lbl">Export history</div><div class="setting-sub">Download all sessions as CSV</div></div><button class="btn sm sec" onclick="exportCSV()">Export</button></div>
+    <div class="setting-row"><div><div class="setting-lbl">Export history</div><div class="setting-sub">Download all sessions as CSV</div></div><button class="btn sm btn-o" onclick="exportCSV()">Export</button></div>
     <div class="setting-row"><div><div class="setting-lbl">Clear all data</div><div class="setting-sub" style="color:var(--danger)">Cannot be undone</div></div><button class="btn sm danger-btn" style="margin:0" onclick="if(confirm('Clear all data?'))clearAll()">Clear</button></div>
   </div>
 </div>
@@ -684,7 +684,7 @@ function buildTplList(){
   var ct=DB.customTemplates;
   var mc=document.getElementById("myTplCount");if(mc)mc.textContent=ct.length;
   var myC=document.getElementById("myTplCards");
-  if(myC)myC.innerHTML=ct.length?ct.map(function(t,i){return '<div class="card" style="margin-bottom:8px;cursor:pointer" onclick="openStartModal('+i+')"><div class="card-row" style="margin-bottom:4px"><span class="card-title">'+t.name+'</span><div style="display:flex;gap:5px"><button class="btn sm sec" style="padding:4px 9px;font-size:11px;margin:0;touch-action:manipulation" onclick="event.stopPropagation();editCustomTpl('+i+')">Edit</button><span class="badge bn">'+t.exercises.length+' ex</span></div></div><div class="card-sub">'+t.exercises.map(function(e){return e.name;}).slice(0,3).join(", ")+(t.exercises.length>3?"...":"")+"</div></div>";}).join(""):"<div style='padding:10px 0 6px;font-size:13px;color:var(--ink3)'>No custom templates yet.</div>";
+  if(myC)myC.innerHTML=ct.length?ct.map(function(t,i){return '<div class="card" style="margin-bottom:8px;cursor:pointer" onclick="openStartModal('+i+')"><div class="card-row" style="margin-bottom:4px"><span class="card-title">'+t.name+'</span><div style="display:flex;gap:5px"><button class="btn sm btn-o" style="padding:4px 9px;font-size:11px;margin:0;touch-action:manipulation" onclick="event.stopPropagation();editCustomTpl('+i+')">Edit</button><span class="badge bn">'+t.exercises.length+' ex</span></div></div><div class="card-sub">'+t.exercises.map(function(e){return e.name;}).slice(0,3).join(", ")+(t.exercises.length>3?"...":"")+"</div></div>";}).join(""):"<div style='padding:10px 0 6px;font-size:13px;color:var(--ink3)'>No custom templates yet.</div>";
   var cc=document.getElementById("coachTplCards");
   if(cc)cc.innerHTML=TEMPLATES.map(function(t,i){return '<div class="card" style="margin-bottom:8px;cursor:pointer" onclick="openStartModal('+(ct.length+i)+')"><div class="card-row" style="margin-bottom:4px"><span class="card-title">'+t.name+'</span><span class="badge bb">'+t.exercises.length+' ex</span></div><div class="card-sub">'+t.muscles.join(" · ")+'</div></div>';}).join("");
 }
@@ -788,7 +788,7 @@ function openTplBuilder(idx){
 }
 
 function closeTplBuilder(){document.getElementById('tplBuilder').style.display='none';renderTemplatesTab();}
-function renderTplBuilderExs(){const el=document.getElementById('tplExList');if(!tplBuilderExs.length){el.innerHTML='<div style="font-size:13px;color:var(--ink3);padding:8px 0">No exercises added yet.</div>';return;}el.innerHTML=tplBuilderExs.map((ex,i)=>'<div class="card" style="padding:12px 14px;margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-size:14px;font-weight:600;color:var(--navy)">'+ex.name+'</div><div style="display:flex;gap:6px">'+(i>0?'<button class="btn sm sec" style="padding:5px 9px;margin:0" onclick="moveTplEx('+i+',-1)">↑</button>':'')+(i<tplBuilderExs.length-1?'<button class="btn sm sec" style="padding:5px 9px;margin:0" onclick="moveTplEx('+i+',1)">↓</button>':'')+'<button class="btn sm danger-btn" style="padding:5px 9px;margin:0" onclick="removeTplEx('+i+')">✕</button></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><div><div class="inp-lbl">Sets</div><input type="number" class="inp inp-c" value="'+ex.sets+'" min="1" max="10" onchange="tplBuilderExs['+i+'].sets=parseInt(this.value)||3"></div><div><div class="inp-lbl">Reps</div><input type="number" class="inp inp-c" value="'+ex.reps+'" min="1" max="50" onchange="tplBuilderExs['+i+'].reps=parseInt(this.value)||10"></div><div><div class="inp-lbl">kg</div><input type="number" class="inp inp-c" value="'+ex.kg+'" min="0" step="2.5" onchange="tplBuilderExs['+i+'].kg=parseFloat(this.value)||0"></div></div></div>').join('');}
+function renderTplBuilderExs(){const el=document.getElementById('tplExList');if(!tplBuilderExs.length){el.innerHTML='<div style="font-size:13px;color:var(--ink3);padding:8px 0">No exercises added yet.</div>';return;}el.innerHTML=tplBuilderExs.map((ex,i)=>'<div class="card" style="padding:12px 14px;margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="font-size:14px;font-weight:600;color:var(--navy)">'+ex.name+'</div><div style="display:flex;gap:6px">'+(i>0?'<button class="btn sm btn-o" style="padding:5px 9px;margin:0" onclick="moveTplEx('+i+',-1)">↑</button>':'')+(i<tplBuilderExs.length-1?'<button class="btn sm btn-o" style="padding:5px 9px;margin:0" onclick="moveTplEx('+i+',1)">↓</button>':'')+'<button class="btn sm danger-btn" style="padding:5px 9px;margin:0" onclick="removeTplEx('+i+')">✕</button></div></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px"><div><div class="inp-lbl">Sets</div><input type="number" class="inp inp-c" value="'+ex.sets+'" min="1" max="10" onchange="tplBuilderExs['+i+'].sets=parseInt(this.value)||3"></div><div><div class="inp-lbl">Reps</div><input type="number" class="inp inp-c" value="'+ex.reps+'" min="1" max="50" onchange="tplBuilderExs['+i+'].reps=parseInt(this.value)||10"></div><div><div class="inp-lbl">kg</div><input type="number" class="inp inp-c" value="'+ex.kg+'" min="0" step="2.5" onchange="tplBuilderExs['+i+'].kg=parseFloat(this.value)||0"></div></div></div>').join('');}
 function moveTplEx(i,dir){const ex=tplBuilderExs.splice(i,1)[0];tplBuilderExs.splice(i+dir,0,ex);renderTplBuilderExs();}
 function removeTplEx(i){tplBuilderExs.splice(i,1);renderTplBuilderExs();}
 function saveTpl(){const name=document.getElementById('tplName').value.trim();if(!name){toast('Enter a template name');return;}if(!tplBuilderExs.length){toast('Add at least one exercise');return;}const tpl={name,exercises:tplBuilderExs};if(tplEditIdx!==null){DB.customTemplates[tplEditIdx]=tpl;}else{DB.customTemplates.push(tpl);}saveDB();buildTplList();closeTplBuilder();toast(tplEditIdx!==null?'Template updated!':'Template created!');}
