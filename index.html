@@ -283,6 +283,13 @@ select.inp{cursor:pointer}
 .nitem[data-n="log"] .nlbl{color:var(--navy);font-weight:600}
 .nitem[data-n="log"].on .nlbl{color:var(--dark)}
 
+
+/* Custom exercise creator inside picker */
+.custom-ex-form{background:var(--powder-xlt);border:1.5px solid var(--powder);border-radius:var(--r12);padding:14px;margin:10px 0}
+.custom-ex-form .inp{background:var(--surface);margin-bottom:8px}
+.custom-ex-form .inp:last-of-type{margin-bottom:0}
+.cex-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.custom-badge{display:inline-flex;align-items:center;padding:2px 7px;background:var(--powder-xlt);border:0.5px solid var(--powder);border-radius:var(--rpill);font-size:10px;font-weight:600;color:var(--dark);margin-left:6px;vertical-align:middle}
 /* Onboarding */
 .ob{padding:calc(24px + var(--safe-top)) 24px 24px;min-height:100vh;display:flex;flex-direction:column;background:var(--surface)}
 .ob-prog{display:flex;gap:4px;margin-bottom:28px}
@@ -447,6 +454,35 @@ input[type=number]{-moz-appearance:textfield}
       </div>
       <div style="padding:12px 16px;border-bottom:0.5px solid var(--border)">
         <input class="inp" id="exPickerSearch" placeholder="Search exercises..." oninput="renderExPicker()" style="border-radius:var(--rpill)">
+      </div>
+      <div style="padding:10px 16px;border-bottom:0.5px solid var(--border)">
+        <button class="btn btn-o" id="createExBtn" onclick="toggleCreateExForm()" style="margin:0;width:100%;font-size:13px;touch-action:manipulation">+ Create your own exercise</button>
+        <div id="createExForm" style="display:none">
+          <div class="custom-ex-form">
+            <div class="inp-lbl">Exercise name</div>
+            <input class="inp" id="newExName" placeholder="e.g. Incline cable chest fly">
+            <div class="cex-row">
+              <div>
+                <div class="inp-lbl">Muscle group</div>
+                <select class="inp" id="newExMuscle">
+                  <option value="">Select...</option>
+                  <option>Back</option><option>Biceps</option><option>Calves</option>
+                  <option>Chest</option><option>Core</option><option>Glutes</option>
+                  <option>Hamstrings</option><option>Quads</option><option>Shoulders</option><option>Triceps</option><option>Other</option>
+                </select>
+              </div>
+              <div>
+                <div class="inp-lbl">Equipment</div>
+                <select class="inp" id="newExEquip">
+                  <option value="">Select...</option>
+                  <option>Barbell</option><option>Dumbbell</option><option>Cable</option>
+                  <option>Machine</option><option>Bodyweight</option><option>Other</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn brand" onclick="saveCustomExFromPicker()" style="margin:0;touch-action:manipulation">Save &amp; add to template</button>
+          </div>
+        </div>
       </div>
       <div style="overflow-y:auto;padding:0 16px" id="exPickerList"></div>
     </div>
@@ -815,6 +851,36 @@ function moveTplEx(i,dir){const ex=tplBuilderExs.splice(i,1)[0];tplBuilderExs.sp
 function removeTplEx(i){tplBuilderExs.splice(i,1);renderTplBuilderExs();}
 function saveTpl(){const name=document.getElementById('tplName').value.trim();if(!name){toast('Enter a template name');return;}if(!tplBuilderExs.length){toast('Add at least one exercise');return;}const tpl={name,exercises:tplBuilderExs};if(tplEditIdx!==null){DB.customTemplates[tplEditIdx]=tpl;}else{DB.customTemplates.push(tpl);}saveDB();buildTplList();closeTplBuilder();toast(tplEditIdx!==null?'Template updated!':'Template created!');}
 function deleteTpl(i){if(!confirm('Delete "'+DB.customTemplates[i].name+'"?'))return;DB.customTemplates.splice(i,1);saveDB();buildTplList();renderTemplatesTab();toast('Template deleted');}
+
+function toggleCreateExForm(){
+  var form=document.getElementById('createExForm');
+  var btn=document.getElementById('createExBtn');
+  var open=form.style.display==='none';
+  form.style.display=open?'block':'none';
+  btn.textContent=open?'− Cancel':'+ Create your own exercise';
+  if(open){document.getElementById('newExName').value='';document.getElementById('newExMuscle').value='';document.getElementById('newExEquip').value='';setTimeout(()=>document.getElementById('newExName').focus(),50);}
+}
+
+function saveCustomExFromPicker(){
+  var name=document.getElementById('newExName').value.trim();
+  var muscle=document.getElementById('newExMuscle').value;
+  var type=document.getElementById('newExEquip').value;
+  if(!name){toast('Enter an exercise name');return;}
+  if(!muscle){toast('Select a muscle group');return;}
+  if(!type){toast('Select equipment type');return;}
+  if(DB.exercises.find(e=>e.name.toLowerCase()===name.toLowerCase())){toast('Exercise already exists');return;}
+  var ex={name,muscle,type,custom:true};
+  DB.exercises.push(ex);
+  saveDB();
+  toast(name+' added!');
+  // Auto-add to template and close form
+  tplBuilderExs.push({name,sets:3,reps:10,kg:0});
+  renderTplBuilderExs();
+  // Reset and close form
+  toggleCreateExForm();
+  // Re-render picker so new exercise shows as added
+  renderExPicker();
+}
 function openExPicker(){document.getElementById('exPickerSearch').value='';renderExPicker();document.getElementById('exPickerOverlay').style.display='block';}
 function closeExPicker(){document.getElementById('exPickerOverlay').style.display='none';}
 function closeExPickerIfBg(e){if(e.target===document.getElementById('exPickerOverlay'))closeExPicker();}
