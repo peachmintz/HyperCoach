@@ -298,24 +298,50 @@ select.inp{cursor:pointer}
 .aw-remove-set:active{opacity:.6}
 
 /* Dark mode */
-@media(prefers-color-scheme:dark){:root{--navy:#1a2e4a;--dark:#1e3a5f;--mid:#4a9eff;--steel:#8ab4d8;--powder:#2a4a6a;--powder-lt:#1e3a52;--powder-xlt:#162b3e;--ink:#e8f0fb;--ink2:#c5d8f5;--ink3:#8ab4d8;--surface:#1e2d3d;--surface2:#141e2b;--surface3:#0d1520;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--success:#4ade80;--success-bg:rgba(74,222,128,0.15);--success-border:rgba(74,222,128,0.3);--warning:#fbbf24;--warning-bg:rgba(251,191,36,0.15);--warning-border:rgba(251,191,36,0.3);--danger:#f87171;--danger-bg:rgba(248,113,113,0.15);--danger-border:rgba(248,113,113,0.3);}html{background:#111c2b}body{background:#111c2b}.aw-tick{border-color:rgba(255,255,255,0.2)}.aw-tick.done{background:var(--mid);border-color:var(--mid)}.aw-set-num.done{background:var(--mid);border-color:var(--mid)}}
-html[data-theme="dark"]{--navy:#1a2e4a;--dark:#1e3a5f;--mid:#4a9eff;--steel:#8ab4d8;--powder:#2a4a6a;--powder-lt:#1e3a52;--powder-xlt:#162b3e;--ink:#e8f0fb;--ink2:#c5d8f5;--ink3:#8ab4d8;--surface:#1e2d3d;--surface2:#141e2b;--surface3:#0d1520;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);--success:#4ade80;--success-bg:rgba(74,222,128,0.15);--success-border:rgba(74,222,128,0.3);--warning:#fbbf24;--warning-bg:rgba(251,191,36,0.15);--warning-border:rgba(251,191,36,0.3);--danger:#f87171;--danger-bg:rgba(248,113,113,0.15);--danger-border:rgba(248,113,113,0.3)}
-html[data-theme="dark"] body,html[data-theme="dark"] .app{background:var(--surface2)}
-
-html[data-theme="dark"] .btn.pri{background:#1a3a6b;color:#fff}
+@media(prefers-color-scheme:dark){
+  html:not([data-theme="light"]){
+    --surface:#1e2d3d;--surface2:#141e2b;--surface3:#0d1520;
+    --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);
+    --ink:#e8f0fb;--ink2:#c5d8f5;--ink3:#8ab4d8;
+    --mid:#4a9eff;--powder-xlt:#162b3e;--powder-lt:#1e3a52;
+    --success:#4ade80;--success-bg:rgba(74,222,128,0.15);--success-border:rgba(74,222,128,0.3);
+    --warning:#fbbf24;--warning-bg:rgba(251,191,36,0.15);--warning-border:rgba(251,191,36,0.3);
+    --danger:#f87171;--danger-bg:rgba(248,113,113,0.15);--danger-border:rgba(248,113,113,0.3);
+  }
+  html:not([data-theme="light"]) body{background:var(--surface2)}
+  html:not([data-theme="light"]) .btn.pri{background:#2563eb;color:#fff}
+  html:not([data-theme="light"]) .btn.brand{background:#2563eb;color:#fff}
+  html:not([data-theme="light"]) .btn.btn-o{color:var(--ink);border-color:var(--border2)}
+  html:not([data-theme="light"]) .card,.aw-ex-card{background:var(--surface)}
+  html:not([data-theme="light"]) .topbar{background:var(--surface2);border-color:var(--border)}
+  html:not([data-theme="light"]) .bnav{background:var(--surface2);border-color:var(--border)}
+  html:not([data-theme="light"]) .inp{background:var(--surface);color:var(--ink);border-color:var(--border2)}
+  html:not([data-theme="light"]) .ob-opt{background:var(--surface);border-color:var(--border2)}
+  html:not([data-theme="light"]) .ob-opt.sel{background:var(--surface2);border-color:var(--mid)}
+  html:not([data-theme="light"]) select.inp option{background:var(--surface2);color:var(--ink)}
+}
+html[data-theme="dark"]{
+  --surface:#1e2d3d;--surface2:#141e2b;--surface3:#0d1520;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);
+  --ink:#e8f0fb;--ink2:#c5d8f5;--ink3:#8ab4d8;
+  --mid:#4a9eff;--powder-xlt:#162b3e;--powder-lt:#1e3a52;
+  --success:#4ade80;--success-bg:rgba(74,222,128,0.15);--success-border:rgba(74,222,128,0.3);
+  --warning:#fbbf24;--warning-bg:rgba(251,191,36,0.15);--warning-border:rgba(251,191,36,0.3);
+  --danger:#f87171;--danger-bg:rgba(248,113,113,0.15);--danger-border:rgba(248,113,113,0.3);
+}
+html[data-theme="dark"] body{background:var(--surface2)}
+html[data-theme="dark"] .btn.pri{background:#2563eb;color:#fff}
 html[data-theme="dark"] .btn.brand{background:#2563eb;color:#fff}
-html[data-theme="dark"] .btn.btn-o{background:transparent;color:var(--ink);border-color:var(--border2)}
-html[data-theme="dark"] .ob-opt{background:var(--surface);color:var(--ink);border-color:var(--border2)}
+html[data-theme="dark"] .btn.btn-o{color:var(--ink);border-color:var(--border2)}
+html[data-theme="dark"] .card,.aw-ex-card{background:var(--surface)}
+html[data-theme="dark"] .topbar{background:var(--surface2);border-color:var(--border)}
+html[data-theme="dark"] .bnav{background:var(--surface2);border-color:var(--border)}
+html[data-theme="dark"] .inp{background:var(--surface);color:var(--ink);border-color:var(--border2)}
+html[data-theme="dark"] .ob-opt{background:var(--surface);border-color:var(--border2)}
 html[data-theme="dark"] .ob-opt.sel{background:var(--surface2);border-color:var(--mid)}
-html[data-theme="dark"] .ob-opt-title{color:var(--ink)}
-html[data-theme="dark"] .ob-opt-sub{color:var(--ink3)}
-html[data-theme="dark"] .ob-q{color:var(--ink)}
-html[data-theme="dark"] .ob-hint{color:var(--ink3)}
-html[data-theme="dark"] .card{background:var(--surface);border-color:var(--border2)}
-html[data-theme="dark"] .topbar{background:var(--surface);border-color:var(--border)}
-html[data-theme="dark"] .bnav{background:var(--surface);border-color:var(--border)}
-html[data-theme="dark"] .inp{background:var(--surface2);color:var(--ink);border-color:var(--border2)}
-@media(prefers-color-scheme:dark){.btn.pri{background:#1a3a6b;color:#fff}.btn.brand{background:#2563eb;color:#fff}.btn.btn-o{background:transparent;color:var(--ink);border-color:var(--border2)}.ob-opt{background:var(--surface);color:var(--ink)}.ob-opt-title{color:var(--ink)}.ob-q{color:var(--ink)}.card{background:var(--surface)}.topbar{background:var(--surface)}.bnav{background:var(--surface)}.inp{background:var(--surface2);color:var(--ink)}}
+html[data-theme="dark"] select.inp option{background:var(--surface2);color:var(--ink)}
+html[data-theme="dark"] .aw-tick.done{background:var(--mid);border-color:var(--mid)}
+html[data-theme="dark"] .aw-set-num.done{background:var(--mid);border-color:var(--mid)}
 /* Onboarding */
 .ob{padding:calc(24px + var(--safe-top)) 24px 24px;min-height:100vh;display:flex;flex-direction:column;background:var(--surface)}
 .ob-prog{display:flex;gap:4px;margin-bottom:28px}
