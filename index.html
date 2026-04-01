@@ -342,6 +342,27 @@ html[data-theme="dark"] .ob-opt.sel{background:var(--surface2);border-color:var(
 html[data-theme="dark"] select.inp option{background:var(--surface2);color:var(--ink)}
 html[data-theme="dark"] .aw-tick.done{background:var(--mid);border-color:var(--mid)}
 html[data-theme="dark"] .aw-set-num.done{background:var(--mid);border-color:var(--mid)}
+html[data-theme="dark"] .logo{color:var(--ink)}
+html[data-theme="dark"] .tab-nav a{color:var(--ink3)}
+html[data-theme="dark"] .tab-nav a.act{color:var(--ink)}
+html[data-theme="dark"] .sec-hd{color:var(--ink3)}
+html[data-theme="dark"] .card-val{color:var(--ink)}
+html[data-theme="dark"] .card-lbl{color:var(--ink3)}
+html[data-theme="dark"] .card-sub{color:var(--ink3)}
+html[data-theme="dark"] h1,html[data-theme="dark"] h2,html[data-theme="dark"] h3{color:var(--ink)}
+html[data-theme="dark"] *{--text-navy:var(--ink)}
+html[data-theme="dark"] .topbar-name{color:var(--ink)}
+html[data-theme="dark"] .streak-pill{background:var(--surface);color:var(--ink);border-color:var(--border2)}
+html[data-theme="dark"] .goal-pill{background:var(--surface);color:var(--ink3);border-color:var(--border2)}
+html[data-theme="dark"] .bnav-label{color:var(--ink3)}
+html[data-theme="dark"] .bnav-icon{color:var(--ink3)}
+html[data-theme="dark"] #activeWorkout{background:var(--surface2)}
+html[data-theme="dark"] .aw-header{background:var(--surface2);border-color:var(--border)}
+html[data-theme="dark"] .aw-ex-card{background:var(--surface);border-color:var(--border)}
+html[data-theme="dark"] .aw-ex-name{color:var(--ink)}
+html[data-theme="dark"] .aw-ex-sub{color:var(--ink3)}
+html[data-theme="dark"] .aw-set-inp{background:var(--surface2);color:var(--ink);border-color:var(--border2)}
+@media(prefers-color-scheme:dark){html:not([data-theme="light"]) .logo{color:var(--ink)}html:not([data-theme="light"]) .card-val{color:var(--ink)}html:not([data-theme="light"]) .sec-hd{color:var(--ink3)}html:not([data-theme="light"]) .streak-pill{background:var(--surface);color:var(--ink);border-color:var(--border2)}html:not([data-theme="light"]) .aw-ex-name{color:var(--ink)}html:not([data-theme="light"]) .aw-set-inp{background:var(--surface2);color:var(--ink)}html:not([data-theme="light"]) .topbar-name{color:var(--ink)}}
 /* Onboarding */
 .ob{padding:calc(24px + var(--safe-top)) 24px 24px;min-height:100vh;display:flex;flex-direction:column;background:var(--surface)}
 .ob-prog{display:flex;gap:4px;margin-bottom:28px}
@@ -391,6 +412,7 @@ input[type=number]{-moz-appearance:textfield}
       <button class="ob-opt" onclick="obSel(0,2,this)"><div class="ob-opt-title">Advanced</div><div class="ob-opt-sub">3+ years, serious about programming</div></button>
     </div>
     <div class="ob-nav"><button class="btn pri" onclick="obNext(0)">Next</button></div>
+<div style="text-align:center;padding-top:8px"><button onclick="skipOnboarding()" style="background:none;border:none;color:var(--ink3);font-size:13px;cursor:pointer;text-decoration:underline;font-family:inherit;touch-action:manipulation;-webkit-tap-highlight-color:transparent" ontouchstart="">Already set up? Skip setup</button></div>
   </div>
   <div id="obs1" style="display:none;flex-direction:column;flex:1">
     <div class="ob-q">Days per week?</div>
@@ -420,7 +442,7 @@ input[type=number]{-moz-appearance:textfield}
       <button class="ob-opt" onclick="obSel(3,1,this)"><div class="ob-opt-title">Home gym</div><div class="ob-opt-sub">Barbells / dumbbells, limited machines</div></button>
       <button class="ob-opt" onclick="obSel(3,2,this)"><div class="ob-opt-title">Bodyweight only</div><div class="ob-opt-sub">No equipment — calisthenics focus</div></button>
     </div>
-    <div class="ob-nav"><button class="btn btn-o" onclick="obBack(3)">Back</button><button class="btn brand" onclick="obFinish()">Get started</button></div><div style="text-align:center;padding:8px 0"><button onclick="skipOnboarding()" style="background:none;border:none;color:var(--ink3);font-size:13px;cursor:pointer;text-decoration:underline;font-family:inherit;touch-action:manipulation">Already set up? Skip</button></div>
+    <div class="ob-nav"><button class="btn btn-o" onclick="obBack(3)">Back</button><button class="btn brand" onclick="obFinish()">Get started</button></div>
   </div>
 </div>
 </div>
