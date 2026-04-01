@@ -446,33 +446,38 @@ input[type=number]{-moz-appearance:textfield}
     </div>
     <button class="btn pri" onclick="saveTpl()" style="touch-action:manipulation">Save template</button>
   </div>
-  <div id="exPickerOverlay" style="display:none;position:fixed;inset:0;background:rgba(1,31,75,0.5);z-index:200;padding:20px" onclick="closeExPickerIfBg(event)">
-    <div style="background:var(--surface);border-radius:var(--r12);max-height:80vh;display:flex;flex-direction:column;overflow:hidden;margin-top:40px">
-      <div style="padding:16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-        <div style="font-size:15px;font-weight:600;color:var(--navy)">Add exercise</div>
+  <div id="exPickerOverlay" style="display:none;position:fixed;inset:0;background:rgba(1,31,75,0.5);z-index:200;display:none;align-items:flex-end" onclick="closeExPickerIfBg(event)">
+    <div style="background:var(--surface);border-radius:var(--r20) var(--r20) 0 0;width:100%;max-width:480px;margin:0 auto;max-height:88vh;display:flex;flex-direction:column;padding-bottom:var(--safe-bottom)">
+      <!-- Header -->
+      <div style="padding:16px 20px 14px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+        <div style="width:36px;height:4px;background:var(--border2);border-radius:2px;position:absolute;top:12px;left:50%;transform:translateX(-50%)"></div>
+        <div style="font-size:15px;font-weight:700;color:var(--navy)">Add exercise</div>
         <button class="btn sm btn-o" onclick="closeExPicker()" style="margin:0;touch-action:manipulation">Done</button>
       </div>
-      <div style="padding:12px 16px;border-bottom:0.5px solid var(--border)">
-        <input class="inp" id="exPickerSearch" placeholder="Search exercises..." oninput="renderExPicker()" style="border-radius:var(--rpill)">
+      <!-- Search -->
+      <div style="padding:10px 16px;border-bottom:0.5px solid var(--border);flex-shrink:0">
+        <input class="inp" id="exPickerSearch" placeholder="Search 102 exercises..." oninput="renderExPicker()" style="border-radius:var(--rpill);margin-bottom:0">
       </div>
-      <div style="padding:10px 16px;border-bottom:0.5px solid var(--border)">
-        <button class="btn btn-o" id="createExBtn" onclick="toggleCreateExForm()" style="margin:0;width:100%;font-size:13px;touch-action:manipulation">+ Create your own exercise</button>
+      <!-- Create your own -->
+      <div style="padding:10px 16px;border-bottom:0.5px solid var(--border);flex-shrink:0">
+        <button class="custom-ex-btn" id="createExBtn" onclick="toggleCreateExForm()">+ Create your own exercise</button>
         <div id="createExForm" style="display:none">
           <div class="custom-ex-form">
-            <div class="inp-lbl">Exercise name</div>
-            <input class="inp" id="newExName" placeholder="e.g. Incline cable chest fly">
-            <div class="cex-row">
+            <div class="inp-lbl" style="margin-bottom:6px">Exercise name</div>
+            <input class="inp" id="newExName" placeholder="e.g. Incline cable chest fly" style="margin-bottom:10px">
+            <div class="cex-grid">
               <div>
-                <div class="inp-lbl">Muscle group</div>
+                <div class="inp-lbl" style="margin-bottom:4px">Muscle group</div>
                 <select class="inp" id="newExMuscle">
                   <option value="">Select...</option>
                   <option>Back</option><option>Biceps</option><option>Calves</option>
                   <option>Chest</option><option>Core</option><option>Glutes</option>
-                  <option>Hamstrings</option><option>Quads</option><option>Shoulders</option><option>Triceps</option><option>Other</option>
+                  <option>Hamstrings</option><option>Quads</option><option>Shoulders</option>
+                  <option>Triceps</option><option>Other</option>
                 </select>
               </div>
               <div>
-                <div class="inp-lbl">Equipment</div>
+                <div class="inp-lbl" style="margin-bottom:4px">Equipment</div>
                 <select class="inp" id="newExEquip">
                   <option value="">Select...</option>
                   <option>Barbell</option><option>Dumbbell</option><option>Cable</option>
@@ -484,7 +489,8 @@ input[type=number]{-moz-appearance:textfield}
           </div>
         </div>
       </div>
-      <div style="overflow-y:auto;padding:0 16px" id="exPickerList"></div>
+      <!-- Exercise list - scrollable -->
+      <div style="overflow-y:auto;flex:1;padding:0 16px" id="exPickerList"></div>
     </div>
   </div>
 </div>
@@ -881,10 +887,10 @@ function saveCustomExFromPicker(){
   // Re-render picker so new exercise shows as added
   renderExPicker();
 }
-function openExPicker(){document.getElementById('exPickerSearch').value='';renderExPicker();document.getElementById('exPickerOverlay').style.display='block';}
+function openExPicker(){document.getElementById('exPickerSearch').value='';renderExPicker();var o=document.getElementById('exPickerOverlay');o.style.display='flex';}
 function closeExPicker(){document.getElementById('exPickerOverlay').style.display='none';}
 function closeExPickerIfBg(e){if(e.target===document.getElementById('exPickerOverlay'))closeExPicker();}
-function renderExPicker(){const q=(document.getElementById('exPickerSearch').value||'').toLowerCase();const filtered=DB.exercises.filter(e=>e.name.toLowerCase().includes(q)||e.muscle.toLowerCase().includes(q));const groups={};filtered.forEach(e=>{if(!groups[e.muscle])groups[e.muscle]=[];groups[e.muscle].push(e);});document.getElementById('exPickerList').innerHTML=Object.entries(groups).map(([muscle,exs])=>'<div style="padding:10px 0 4px;font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em">'+muscle+'</div>'+exs.map(ex=>{const already=tplBuilderExs.some(e=>e.name===ex.name);const safeName=ex.name.replace(/\\/g,'\\\\').replace(/'/g,'&#39;');return '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:0.5px solid var(--border)"><div><div style="font-size:14px;font-weight:500;color:var(--navy)">'+ex.name+'</div><div style="font-size:12px;color:var(--ink3)">'+ex.type+'</div></div><button class="btn sm '+(already?'ghost':'brand')+'" style="margin:0;padding:7px 14px" data-exname="'+safeName+'" onclick="toggleExInTpl(this)">'+( already?'Added ✓':'+ Add')+'</button></div>';}).join('')).join('')||'<div style="padding:20px 0;text-align:center;font-size:13px;color:var(--ink3)">No exercises found</div>';}
+function renderExPicker(){const q=(document.getElementById('exPickerSearch').value||'').toLowerCase();const filtered=DB.exercises.filter(e=>e.name.toLowerCase().includes(q)||e.muscle.toLowerCase().includes(q));const groups={};filtered.sort(function(a,b){return (b.custom?1:0)-(a.custom?1:0);});filtered.forEach(e=>{if(!groups[e.muscle])groups[e.muscle]=[];groups[e.muscle].push(e);});document.getElementById('exPickerList').innerHTML=Object.entries(groups).map(([muscle,exs])=>'<div style="padding:10px 0 4px;font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em">'+muscle+'</div>'+exs.map(ex=>{const already=tplBuilderExs.some(e=>e.name===ex.name);const safeName=ex.name.replace(/\\/g,'\\\\').replace(/'/g,'&#39;');return '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:0.5px solid var(--border)"><div><div style="font-size:14px;font-weight:500;color:var(--navy)">'+ex.name+'</div><div style="font-size:12px;color:var(--ink3)">'+ex.type+'</div></div><button class="btn sm '+(already?'ghost':'brand')+'" style="margin:0;padding:7px 14px" data-exname="'+safeName+'" onclick="toggleExInTpl(this)">'+( already?'Added ✓':'+ Add')+'</button></div>';}).join('')).join('')||'<div style="padding:20px 0;text-align:center;font-size:13px;color:var(--ink3)">No exercises found</div>';}
 function toggleExInTpl(btn){const name=btn.dataset.exname;const idx=tplBuilderExs.findIndex(e=>e.name===name);if(idx>=0){tplBuilderExs.splice(idx,1);btn.textContent='+ Add';btn.className='btn sm brand';btn.style.cssText='margin:0;padding:7px 14px';}else{const ex=DB.exercises.find(e=>e.name===name);if(ex)tplBuilderExs.push({name:ex.name,sets:3,reps:10,kg:0});btn.textContent='Added ✓';btn.className='btn sm ghost';btn.style.cssText='margin:0;padding:7px 14px';}renderTplBuilderExs();}
 
 var pendingTplIdx=null;
