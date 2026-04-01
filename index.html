@@ -390,6 +390,23 @@ html[data-theme="dark"] .nico-wrap{background:#1a3a6b!important}
 html[data-theme="dark"] .aw-header{background:#1a2332!important;border-color:rgba(255,255,255,0.08)!important}
 html[data-theme="dark"] .aw-header *:not(button){color:var(--ink)!important}
 @media(prefers-color-scheme:dark){html:not([data-theme="light"]) .nico-wrap{background:#1a3a6b!important}html:not([data-theme="light"]) .aw-header{background:#1a2332!important}html:not([data-theme="light"]) .aw-header *:not(button){color:var(--ink)!important}}
+
+/* Weekly Debrief */
+.debrief-card{border-radius:var(--r12);overflow:hidden;margin-bottom:12px}
+.debrief-header{padding:14px 16px 10px;display:flex;align-items:center;gap:10px}
+.debrief-icon{font-size:20px;line-height:1}
+.debrief-title{font-size:13px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3)}
+.debrief-body{padding:0 16px 14px;display:flex;flex-direction:column;gap:10px}
+.debrief-section{font-size:14px;line-height:1.5;color:var(--ink)}
+.debrief-section strong{color:var(--ink);font-weight:700}
+.debrief-rec{background:var(--powder-xlt);border-radius:var(--r8);padding:10px 12px;font-size:13px;color:var(--ink);line-height:1.55;border-left:3px solid var(--mid)}
+.debrief-muscle-row{display:flex;align-items:center;gap:8px;font-size:13px}
+.debrief-muscle-name{width:90px;color:var(--ink);font-weight:500;flex-shrink:0}
+.debrief-bar-bg{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.debrief-bar-fill{height:100%;border-radius:3px;transition:width .4s}
+.debrief-muscle-status{font-size:11px;font-weight:600;width:52px;text-align:right;flex-shrink:0}
+.debrief-empty{padding:14px 16px;font-size:13px;color:var(--ink3);text-align:center}
+html[data-theme="dark"] .debrief-rec{background:var(--surface);border-left-color:var(--mid)}
 /* Onboarding */
 .ob{padding:calc(24px + var(--safe-top)) 24px 24px;min-height:100vh;display:flex;flex-direction:column;background:var(--surface)}
 .ob-prog{display:flex;gap:4px;margin-bottom:28px}
@@ -904,7 +921,7 @@ function toggleCTimer(){ctRun=!ctRun;document.getElementById('ctGoBtn').textCont
 function addCTime(s){ctRem+=s;updCT();}
 function stopCTimer(){clearInterval(ctInt);ctRun=false;['ctDisp','ctLbl','ctBtns'].forEach(id=>document.getElementById(id).style.display='none');}
 
-function renderDash(){renderGoalBar();const s=DB.sessions,wk=Date.now()-7*86400000,tw=s.filter(x=>new Date(x.date).getTime()>wk);const wsets=tw.reduce((a,x)=>a+x.exercises.reduce((b,e)=>b+e.sets,0),0);document.getElementById('d-vol').textContent=wsets;document.getElementById('d-vold').textContent=tw.length+' sessions this week';document.getElementById('d-sess').textContent=s.length;document.getElementById('d-sessd').textContent=s.length?'All time':'Log your first session';document.getElementById('d-streak').innerHTML=(DB.streak||0)+'<span class="stat-unit">d</span>';document.getElementById('streakTxt').textContent=(DB.streak||0)+'d';const bs=s.flatMap(x=>x.exercises.filter(e=>e.name==='Bench press'));if(bs.length){const best=bs.reduce((a,b)=>b.kg>a.kg?b:a);document.getElementById('d-bench').innerHTML=best.kg+'<span class="stat-unit">kg</span>';if(bs.length>1){const p2=bs[bs.length-2];document.getElementById('d-benchd').textContent=(best.kg>=p2.kg?'+':'')+(best.kg-p2.kg).toFixed(1)+' kg from last';}}renderAlerts(s);renderPR(s);renderOLTargets(s);renderVolLand(s);}
+function renderDash(){renderGoalBar();const s=DB.sessions,wk=Date.now()-7*86400000,tw=s.filter(x=>new Date(x.date).getTime()>wk);const wsets=tw.reduce((a,x)=>a+x.exercises.reduce((b,e)=>b+e.sets,0),0);document.getElementById('d-vol').textContent=wsets;document.getElementById('d-vold').textContent=tw.length+' sessions this week';document.getElementById('d-sess').textContent=s.length;document.getElementById('d-sessd').textContent=s.length?'All time':'Log your first session';document.getElementById('d-streak').innerHTML=(DB.streak||0)+'<span class="stat-unit">d</span>';document.getElementById('streakTxt').textContent=(DB.streak||0)+'d';const bs=s.flatMap(x=>x.exercises.filter(e=>e.name==='Bench press'));if(bs.length){const best=bs.reduce((a,b)=>b.kg>a.kg?b:a);document.getElementById('d-bench').innerHTML=best.kg+'<span class="stat-unit">kg</span>';if(bs.length>1){const p2=bs[bs.length-2];document.getElementById('d-benchd').textContent=(best.kg>=p2.kg?'+':'')+(best.kg-p2.kg).toFixed(1)+' kg from last';}}renderAlerts(s);renderPR(s);renderOLTargets(s);renderVolLand(s);renderDebrief(s);}
 function renderAlerts(s){const el=document.getElementById('alerts');const al=[];if(s.length>=4){const l4=s.slice(-4);let drops=0;for(let i=1;i<l4.length;i++){const avg=x=>x.exercises.reduce((a,e)=>a+e.kg,0)/x.exercises.length;if(avg(l4[i])<avg(l4[i-1]))drops++;}if(drops>=2)al.push({type:'w',title:'Deload week recommended',body:'Average weights dropped across '+drops+' of your last 4 sessions. Reduce volume 40–50% this week.'});}if(s.length>=2){const wk=Date.now()-7*86400000,tw=s.filter(x=>new Date(x.date).getTime()>wk);const push=tw.reduce((a,x)=>a+x.exercises.filter(e=>['Bench press','Incline DB press','Cable fly','OHP (barbell)'].includes(e.name)).reduce((b,e)=>b+e.sets,0),0);const pull=tw.reduce((a,x)=>a+x.exercises.filter(e=>['Barbell row','Cable row','Pull-up (weighted)','Face pulls'].includes(e.name)).reduce((b,e)=>b+e.sets,0),0);if(push>0&&pull>0&&push/pull>2)al.push({type:'d',title:'Muscle imbalance warning',body:`Push:pull ratio is ${push}:${pull} this week. Aim for 1:1 to protect shoulder health.`});}const plat=s.length>=3?['Bench press','Squat (barbell)','Barbell row'].reduce((acc,lift)=>{const d=s.flatMap(x=>x.exercises.filter(e=>e.name===lift).map(e=>e.kg)).slice(-4);if(d.length>=3&&d.every(v=>v===d[0]))acc.push({name:lift,n:d.length});return acc;},[]):[];if(plat.length)al.push({type:'w',title:'Plateau detected',body:plat[0].name+' has not progressed in '+plat[0].n+' sessions. Try a rep range change or deload.'});el.innerHTML=al.map(a=>`<div class="card alert-${a.type}" style="margin-bottom:10px"><div class="alert-title at-${a.type}">${a.title}</div><div class="alert-body ab-${a.type}">${a.body}</div></div>`).join('');}
 function renderPR(s){const el=document.getElementById('prBanner');if(s.length<2){el.innerHTML='';return;}const last=s[s.length-1],prev=s.slice(0,-1);let pr='';last.exercises.forEach(ex=>{const pm=prev.flatMap(x=>x.exercises.filter(e=>e.name===ex.name)).map(e=>e.kg);if(pm.length&&ex.kg>Math.max(...pm))pr=`${ex.name} — ${ex.kg} kg (+${(ex.kg-Math.max(...pm)).toFixed(1)} kg)`;});el.innerHTML=pr?`<div class="pr-banner"><div class="pr-star"><svg width="16" height="16" viewBox="0 0 16 16" fill="white"><path d="M8 1l1.8 3.6 4 .6-2.9 2.8.7 4L8 10l-3.6 1.9.7-4L2.2 5.2l4-.6z"/></svg></div><div class="pr-text"><strong>New personal record</strong>${pr}</div></div>`:'';};
 function renderOLTargets(s){const el=document.getElementById('olCard');if(!s.length){el.innerHTML='<div style="font-size:13px;color:var(--ink3)">Log a session to see overload targets.</div>';return;}const last=s[s.length-1];el.innerHTML=last.exercises.slice(0,3).map(ex=>{const nk=ex.rir<=1?ex.kg+2.5:ex.kg,pct=Math.min(100,ex.rir<=1?100:60);const color=pct>=100?'#005b96':pct>=60?'#6497b1':'#7a4e0d';return `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:13px;color:var(--ink);font-weight:500">${ex.name}</span><span style="font-size:12px;color:var(--ink3)">${ex.kg} → <strong style="color:var(--ink)">${(+nk).toFixed(1)} kg</strong></span></div><div class="prog-bg"><div class="prog-bar" style="width:${pct}%;background:${color}"></div></div></div>`;}).join('');}
@@ -1056,6 +1073,116 @@ function renderSwapList(){var q=(document.getElementById("swapSearch").value||""
 function doSwapExercise(btn){var name=btn.dataset.exname,old=awExercises[swapTargetExIdx];awExercises[swapTargetExIdx]={name:name,sets:old.sets.map(function(s){return Object.assign({},s,{done:false});})};closeSwapModal();renderActiveWorkout();toast("Swapped to "+name);}
 function toggleDark(){var d=document.documentElement.getAttribute("data-theme")==="dark";document.documentElement.setAttribute("data-theme",d?"light":"dark");document.getElementById("darkBtn").textContent=d?"☀️":"🌙";try{localStorage.setItem("hc_theme",d?"light":"dark");}catch(e){}}
 function skipOnboarding(){document.getElementById('onboarding').style.display='none';document.getElementById('mainApp').style.display='block';initApp();}
+
+function renderDebrief(sessions){
+  var el = document.getElementById('debriefCard');
+  if(!el) return;
+
+  // Get this week's sessions (last 7 days)
+  var now = Date.now();
+  var weekAgo = now - 7*86400000;
+  var weekSess = sessions.filter(function(s){ return new Date(s.date).getTime() > weekAgo; });
+
+  if(!weekSess.length){
+    el.innerHTML = '<div class="debrief-empty">Log a session to see your weekly debrief.</div>';
+    return;
+  }
+
+  // ── Volume per muscle this week ──
+  var volByMuscle = {};
+  weekSess.forEach(function(s){
+    s.exercises.forEach(function(e){
+      var m = EMMAP[e.name];
+      if(m){ volByMuscle[m] = (volByMuscle[m]||0) + (e.sets||0); }
+    });
+  });
+
+  // ── Progression: check RIR trend across all exercises ──
+  var progressionItems = [];
+  var stallItems = [];
+  var deloadCandidates = [];
+
+  // Look at last 3 weeks of data for trend
+  var threeWeeksAgo = now - 21*86400000;
+  var recentSess = sessions.filter(function(s){ return new Date(s.date).getTime() > threeWeeksAgo; });
+
+  // Group by exercise name, get avg RIR per session
+  var exHistory = {};
+  recentSess.forEach(function(s){
+    s.exercises.forEach(function(e){
+      if(!exHistory[e.name]) exHistory[e.name] = [];
+      exHistory[e.name].push({date: s.date, rir: e.rir, kg: e.kg, reps: e.reps});
+    });
+  });
+
+  Object.keys(exHistory).forEach(function(name){
+    var hist = exHistory[name];
+    if(hist.length < 2) return;
+    var last = hist[hist.length-1];
+    var prev = hist[hist.length-2];
+    // Progression: weight went up
+    if(last.kg > prev.kg) progressionItems.push(name + ' +' + (last.kg - prev.kg).toFixed(1) + 'kg');
+    // Stall: same weight and RIR ≥ 3 for 2+ sessions
+    if(last.kg === prev.kg && last.rir >= 3 && prev.rir >= 3) stallItems.push(name);
+    // Deload candidate: RIR 0 for 3+ consecutive sessions
+    if(hist.length >= 3) {
+      var last3 = hist.slice(-3);
+      if(last3.every(function(h){ return h.rir <= 1; })) deloadCandidates.push(name);
+    }
+  });
+
+  // ── Volume status per muscle ──
+  var muscleRows = '';
+  var overMRV = [], underMEV = [], atMAV = [];
+  Object.keys(MVOLS).forEach(function(m){
+    var sets = volByMuscle[m] || 0;
+    var mv = MVOLS[m];
+    var pct = Math.min(100, Math.round(sets / mv.mrv * 100));
+    var color, status, statusColor;
+    if(sets === 0){ color='var(--border2)'; status='None'; statusColor='var(--ink3)'; underMEV.push(m); }
+    else if(sets >= mv.mrv){ color='#f87171'; status='Over'; statusColor='#f87171'; overMRV.push(m); }
+    else if(sets >= mv.mav){ color='#4ade80'; status='MAV'; statusColor='#4ade80'; atMAV.push(m); }
+    else if(sets >= mv.mev){ color='var(--mid)'; status='MEV'; statusColor='var(--mid)'; }
+    else { color='#fbbf24'; status='Low'; statusColor='#fbbf24'; underMEV.push(m); }
+    muscleRows += '<div class="debrief-muscle-row">'
+      + '<div class="debrief-muscle-name" style="color:var(--ink)">' + m + '</div>'
+      + '<div class="debrief-bar-bg"><div class="debrief-bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div>'
+      + '<div class="debrief-muscle-status" style="color:' + statusColor + '">' + sets + '/' + mv.mrv + '</div>'
+      + '</div>';
+  });
+
+  // ── Generate narrative recommendation ──
+  var recs = [];
+  if(deloadCandidates.length >= 2){
+    recs.push('🚨 <strong>Deload incoming:</strong> ' + deloadCandidates.slice(0,3).join(', ') + ' have been at RIR 0–1 for 3+ weeks. Consider a deload next week — drop volume by 40–50% and keep weights the same.');
+  } else if(stallItems.length >= 2){
+    recs.push('⚠️ <strong>Effort check:</strong> ' + stallItems.slice(0,3).join(', ') + ' haven’t progressed and you’re leaving 3+ RIR. Push closer to failure — aim for RIR 1–2.');
+  }
+  if(overMRV.length){
+    recs.push('📊 <strong>Volume ceiling hit:</strong> ' + overMRV.join(', ') + ' is over MRV. Consider cutting a set next week — more volume won’t drive more growth at this point.');
+  }
+  if(underMEV.length >= 3){
+    recs.push('💡 <strong>Gaps in coverage:</strong> ' + underMEV.slice(0,4).join(', ') + ' didn’t hit minimum effective volume this week. Add one working set each next session.');
+  }
+  if(progressionItems.length){
+    recs.push('⬆️ <strong>Progressed this week:</strong> ' + progressionItems.slice(0,4).join(', ') + '. Keep the momentum — same plan next week.');
+  }
+  if(!recs.length){
+    recs.push('✅ <strong>Solid week:</strong> Volume is in a good range and progression looks steady. Stay the course.');
+  }
+
+  // ── Render ──
+  var totalSets = weekSess.reduce(function(a,s){ return a + s.exercises.reduce(function(b,e){ return b+(e.sets||0);},0);},0);
+  var totalWorkouts = weekSess.length;
+
+  el.innerHTML =
+    '<div class="debrief-header"><div class="debrief-icon">📋</div><div class="debrief-title">Week in review</div></div>'
+    + '<div class="debrief-body">'
+    + '<div class="debrief-section" style="color:var(--ink3);font-size:13px">' + totalWorkouts + ' workout' + (totalWorkouts!==1?'s':'') + ' · ' + totalSets + ' total sets</div>'
+    + '<div style="display:flex;flex-direction:column;gap:6px">' + muscleRows + '</div>'
+    + recs.map(function(r){ return '<div class="debrief-rec">' + r + '</div>'; }).join('')
+    + '</div>';
+}
 function initApp(){buildTplList();renderDash();renderSettings();renderTemplatesTab();}
 
 try{var _t=localStorage.getItem("hc_theme");if(_t==="dark"){document.documentElement.setAttribute("data-theme","dark");var _db=document.getElementById("darkBtn");if(_db)_db.textContent="🌙";}}catch(e){}
