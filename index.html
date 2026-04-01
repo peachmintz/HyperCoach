@@ -263,7 +263,7 @@ select.inp{cursor:pointer}
 .aw-ex-header{padding:14px 16px 10px;border-bottom:0.5px solid var(--border)}
 .aw-ex-name{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:2px}
 .aw-ex-sub{font-size:12px;color:var(--ink3)}
-.aw-set-row{display:grid;grid-template-columns:32px 1fr 1fr 1fr 40px;gap:6px;align-items:center;padding:8px 16px;border-bottom:0.5px solid var(--border)}
+.aw-set-row{display:grid;grid-template-columns:32px 1fr 1fr 1fr 40px 28px;gap:6px;align-items:center;padding:8px 16px;border-bottom:0.5px solid var(--border)}
 .aw-set-row:last-child{border-bottom:none}
 .aw-set-num{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--surface2);color:var(--ink3);border:0.5px solid var(--border2);flex-shrink:0}
 .aw-set-num.done{background:var(--success-bg);color:var(--success);border-color:var(--success-border)}
@@ -272,7 +272,7 @@ select.inp{cursor:pointer}
 .aw-tick{width:36px;height:36px;border-radius:50%;border:none;background:var(--surface2);display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background .15s}
 .aw-tick.done{background:var(--success-bg)}
 .aw-tick:active{opacity:.7}
-.aw-set-hdr{display:grid;grid-template-columns:32px 1fr 1fr 1fr 40px;gap:6px;padding:6px 16px 2px}
+.aw-set-hdr{display:grid;grid-template-columns:32px 1fr 1fr 1fr 40px 28px;gap:6px;padding:6px 16px 2px}
 .aw-col-h{font-size:10px;font-weight:600;color:var(--ink3);text-align:center;text-transform:uppercase;letter-spacing:.05em}
 .aw-col-h:nth-child(2){text-align:left;padding-left:4px}
 .nitem[data-n="log"]{padding:4px 8px}
@@ -290,6 +290,12 @@ select.inp{cursor:pointer}
 .custom-ex-form .inp:last-of-type{margin-bottom:0}
 .cex-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .custom-badge{display:inline-flex;align-items:center;padding:2px 7px;background:var(--powder-xlt);border:0.5px solid var(--powder);border-radius:var(--rpill);font-size:10px;font-weight:600;color:var(--dark);margin-left:6px;vertical-align:middle}
+.aw-target{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:var(--rpill);font-size:12px;font-weight:600;margin-top:6px}
+.aw-target.up{background:#e8f5ee;color:#1a6b3c}
+.aw-target.hold{background:var(--powder-xlt);color:var(--dark)}
+.aw-target.push{background:#fdf3e3;color:#7a4e0d}
+.aw-remove-set{width:28px;height:28px;border-radius:50%;border:none;background:var(--surface2);display:flex;align-items:center;justify-content:center;cursor:pointer;touch-action:manipulation;color:var(--ink3);font-size:16px;font-weight:300;line-height:1;font-family:inherit;flex-shrink:0}
+.aw-remove-set:active{opacity:.6}
 /* Onboarding */
 .ob{padding:calc(24px + var(--safe-top)) 24px 24px;min-height:100vh;display:flex;flex-direction:column;background:var(--surface)}
 .ob-prog{display:flex;gap:4px;margin-bottom:28px}
@@ -900,8 +906,43 @@ function confirmStartWorkout(){var idx=pendingTplIdx;closeStartModal();startActi
 
 var awTplIdx=null,awExercises=[],awStartTime=null,awTimerInt=null,awRestInt=null,awRestRem=0,awRestTot=0,swapTargetExIdx=null;
 function startActiveWorkout(idx){awTplIdx=idx;var t=allTemplates()[idx],prev=prevSess(t.id||t.name),gc=GOAL_CFG[DB.goal];awExercises=t.exercises.map(function(ex,i){var p=prev?prev.exercises[i]:null,kg=p?nextKg(p):ex.kg,reps=p?p.reps:Math.min(ex.reps,gc.repMax);return {name:ex.name,sets:Array.from({length:ex.sets},function(){return {kg:+kg.toFixed(1),reps:reps,rir:2,done:false};})};});awStartTime=Date.now();document.getElementById("awTitle").textContent=t.name;document.getElementById("activeWorkout").style.display="block";document.body.style.overflow="hidden";awTimerInt=setInterval(function(){var e=Math.floor((Date.now()-awStartTime)/1000),m=Math.floor(e/60),s=e%60;document.getElementById("awTimer").textContent=m+":"+(s<10?"0":"")+s;},1000);renderActiveWorkout();}
-function renderActiveWorkout(){var total=awExercises.reduce(function(a,ex){return a+ex.sets.length;},0),done=awExercises.reduce(function(a,ex){return a+ex.sets.filter(function(s){return s.done;}).length;},0);document.getElementById("awProgressBar").style.width=(total?done/total*100:0)+"%";var html="";awExercises.forEach(function(ex,ei){var setsDone=ex.sets.filter(function(s){return s.done;}).length;var t2=allTemplates()[awTplIdx],prev2=prevSess(t2.id||t2.name),prevStr=prev2&&prev2.exercises[ei]?'<div style="margin-top:6px;font-size:12px;color:var(--ink3)">Last: '+prev2.exercises[ei].kg+' kg x '+prev2.exercises[ei].reps+' reps</div>':"";var rows="";ex.sets.forEach(function(set,si){var rirOpts="";[0,1,2,3,4].forEach(function(r){rirOpts+='<option value="'+r+'"'+(set.rir===r?' selected':'')+'>'+r+'</option>';});rows+='<div class="aw-set-row" style="'+(set.done?"opacity:0.6":"")+'">'+'<div class="aw-set-num '+(set.done?"done":"")+'">'+( set.done?"&#10003;":(si+1))+"</div>"+'<input type="number" class="aw-set-inp" value="'+set.kg+'" step="2.5" min="0" onchange="awExercises['+ei+'].sets['+si+'].kg=+this.value" onclick="this.select()">'+'<input type="number" class="aw-set-inp" value="'+set.reps+'" min="1" max="100" onchange="awExercises['+ei+'].sets['+si+'].reps=+this.value" onclick="this.select()">'+'<select class="aw-set-inp" onchange="awExercises['+ei+'].sets['+si+'].rir=+this.value">'+rirOpts+'</select>'+'<button class="aw-tick '+(set.done?"done":"")+'" onclick="awTickSet('+ei+','+si+')" style="display:flex;align-items:center;justify-content:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="'+(set.done?"var(--success)":"var(--ink3)")+'" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg></button></div>';});html+='<div class="aw-ex-card" id="awex'+ei+'"><div class="aw-ex-header"><div style="display:flex;align-items:center;justify-content:space-between"><div><div class="aw-ex-name">'+ex.name+'</div><div class="aw-ex-sub">'+setsDone+"/"+ex.sets.length+" sets done</div></div>"+'<button onclick="openSwapModal('+ei+')" style="background:var(--surface2);border:0.5px solid var(--border2);color:var(--ink3);padding:6px 10px;border-radius:var(--r8);font-size:12px;cursor:pointer;touch-action:manipulation;font-family:inherit">Swap</button></div>'+prevStr+'</div><div class="aw-set-hdr"><div class="aw-col-h" style="text-align:left;padding-left:2px">Set</div><div class="aw-col-h">kg</div><div class="aw-col-h">Reps</div><div class="aw-col-h">RIR</div><div class="aw-col-h"></div></div>'+rows+'<div style="padding:10px 16px"><button onclick="awAddSet('+ei+')" style="background:none;border:0.5px dashed var(--border2);color:var(--ink3);padding:8px;border-radius:var(--r8);font-size:12px;cursor:pointer;width:100%;touch-action:manipulation;font-family:inherit">+ Add set</button></div></div>';});document.getElementById("awExercises").innerHTML=html;}
+function renderActiveWorkout(){
+  var total=awExercises.reduce(function(a,ex){return a+ex.sets.length;},0);
+  var done=awExercises.reduce(function(a,ex){return a+ex.sets.filter(function(s){return s.done;}).length;},0);
+  document.getElementById('awProgressBar').style.width=(total?done/total*100:0)+'%';
+  var html='';
+  awExercises.forEach(function(ex,ei){
+    var t=allTemplates()[awTplIdx];
+    var prev=t?prevSess(t.id||t.name):null;
+    var pEx=prev&&prev.exercises[ei]?prev.exercises[ei]:null;
+    var targetHTML='';
+    if(pEx){
+      var targetKg=pEx.kg,chipClass='hold',chipIcon='→',chipLabel='Target: '+pEx.kg+' kg × '+pEx.reps+' reps';
+      if(pEx.rir===0){targetKg=+(pEx.kg+2.5).toFixed(1);chipClass='up';chipIcon='↑';chipLabel='Target: '+targetKg+' kg — earned +2.5 kg!';}
+      else if(pEx.rir>=4){chipClass='push';chipIcon='!';chipLabel='Target: '+pEx.kg+' kg — push harder (RIR '+pEx.rir+' last time)';}
+      targetHTML='<div class="aw-target '+chipClass+'"><span>'+chipIcon+'</span><span>'+chipLabel+'</span></div>';
+    }
+    var setsDone=ex.sets.filter(function(s){return s.done;}).length;
+    html+='<div class="aw-ex-card" id="awex'+ei+'"><div class="aw-ex-header"><div style="display:flex;align-items:center;justify-content:space-between"><div><div class="aw-ex-name">'+ex.name+'</div><div class="aw-ex-sub">'+setsDone+'/'+ex.sets.length+' sets done</div></div><button onclick="openSwapModal('+ei+')" style="background:var(--surface2);border:0.5px solid var(--border2);color:var(--ink3);padding:6px 10px;border-radius:var(--r8);font-size:12px;cursor:pointer;touch-action:manipulation;font-family:inherit">Swap</button></div>'+targetHTML+'</div>';
+    html+='<div class="aw-set-hdr"><div class="aw-col-h" style="text-align:left;padding-left:2px">Set</div><div class="aw-col-h">kg</div><div class="aw-col-h">Reps</div><div class="aw-col-h">RIR</div><div class="aw-col-h"></div><div class="aw-col-h"></div></div>';
+    ex.sets.forEach(function(set,si){
+      var rirOpts='';[0,1,2,3,4].forEach(function(r){rirOpts+='<option value="'+r+'"'+(set.rir===r?' selected':'')+'>'+r+'</option>';});
+      var tick=set.done?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20,6 9,17 4,12"/></svg>':(si+1);
+      html+='<div class="aw-set-row" style="'+(set.done?'opacity:0.65':'')+'"><div class="aw-set-num '+(set.done?'done':'')+'">'+tick+'</div>';
+      html+='<input type="number" class="aw-set-inp" value="'+set.kg+'" step="2.5" min="0" onchange="awExercises['+ei+'].sets['+si+'].kg=+this.value" onclick="this.select()">';
+      html+='<input type="number" class="aw-set-inp" value="'+set.reps+'" min="1" max="100" onchange="awExercises['+ei+'].sets['+si+'].reps=+this.value" onclick="this.select()">';
+      html+='<select class="aw-set-inp" onchange="awExercises['+ei+'].sets['+si+'].rir=+this.value">'+rirOpts+'</select>';
+      html+='<button class="aw-tick '+(set.done?'done':'')+'" onclick="awTickSet('+ei+','+si+')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="'+(set.done?'var(--success)':'var(--ink3)')+'" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg></button>';
+      html+='<button class="aw-remove-set" onclick="awRemoveSet('+ei+','+si+')">×</button>';
+      html+='</div>';
+    });
+    html+='<div style="padding:10px 16px"><button onclick="awAddSet('+ei+')" style="background:none;border:0.5px dashed var(--border2);color:var(--ink3);padding:8px;border-radius:var(--r8);font-size:12px;cursor:pointer;width:100%;touch-action:manipulation;font-family:inherit">+ Add set</button></div></div>';
+  });
+  document.getElementById('awExercises').innerHTML=html;
+}
+
 function awTickSet(ei,si){var set=awExercises[ei].sets[si];set.done=!set.done;renderActiveWorkout();if(set.done){awStartRestTimer(GOAL_CFG[DB.goal].rest);}}
+function awRemoveSet(ei,si){if(awExercises[ei].sets.length<=1){toast("Need at least 1 set");return;}awExercises[ei].sets.splice(si,1);renderActiveWorkout();}
 function awAddSet(ei){var ex=awExercises[ei],last=ex.sets[ex.sets.length-1];ex.sets.push({kg:last.kg,reps:last.reps,rir:last.rir,done:false});renderActiveWorkout();}
 function awStartRestTimer(secs){awRestTot=secs;awRestRem=secs;if(awRestInt)clearInterval(awRestInt);document.getElementById("awTimerBar").style.display="block";awUpdateRestDisplay();awRestInt=setInterval(function(){awRestRem--;awUpdateRestDisplay();if(awRestRem<=0)awSkipTimer();},1000);}
 function awUpdateRestDisplay(){var m=Math.floor(Math.abs(awRestRem)/60),s=Math.abs(awRestRem)%60;document.getElementById("awTimerDisp").textContent=m+":"+(s<10?"0":"")+s;document.getElementById("awTimerProg").style.width=Math.max(0,awRestRem/awRestTot*100)+"%";}
