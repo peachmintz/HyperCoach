@@ -327,7 +327,7 @@ input[type=number]{-moz-appearance:textfield}
 <body>
 
 <!-- ONBOARDING -->
-<div id="onboarding">
+<div id="onboarding" style="display:none">
 <div class="ob">
   <div class="ob-prog"><div class="ob-dot" id="od0"></div><div class="ob-dot" id="od1"></div><div class="ob-dot" id="od2"></div><div class="ob-dot" id="od3"></div></div>
   <div id="obs0" style="display:flex;flex-direction:column;flex:1">
@@ -375,7 +375,7 @@ input[type=number]{-moz-appearance:textfield}
 </div>
 
 <!-- MAIN APP -->
-<div id="mainApp" style="display:none">
+<div id="mainApp" style="display:block">
 <div class="app">
 
 <div class="topbar">
@@ -918,7 +918,10 @@ function doSwapExercise(btn){var name=btn.dataset.exname,old=awExercises[swapTar
 function initApp(){buildTplList();renderDash();renderSettings();renderTemplatesTab();}
 
 loadDB();
-if(localStorage.getItem('hc_v5')){
+if(!localStorage.getItem('hc_v5')||!DB.profile||!DB.profile.level){
+  document.getElementById('onboarding').style.display='block';
+  document.getElementById('mainApp').style.display='none';
+} else {
   document.getElementById('onboarding').style.display='none';
   document.getElementById('mainApp').style.display='block';
   initApp();
