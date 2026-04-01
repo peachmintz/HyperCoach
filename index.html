@@ -369,6 +369,7 @@ input[type=number]{-moz-appearance:textfield}
       <button class="ob-opt" onclick="obSel(3,2,this)"><div class="ob-opt-title">Bodyweight only</div><div class="ob-opt-sub">No equipment — calisthenics focus</div></button>
     </div>
     <div class="ob-nav"><button class="btn btn-o" onclick="obBack(3)">Back</button><button class="btn brand" onclick="obFinish()">Get started</button></div>
+<div style="text-align:center;padding-bottom:8px"><button onclick="skipOnboarding()" style="background:none;border:none;color:var(--ink3);font-size:13px;cursor:pointer;text-decoration:underline;touch-action:manipulation;font-family:inherit">Already set up? Skip</button></div>
   </div>
 </div>
 </div>
@@ -718,6 +719,7 @@ function saveDB(){try{localStorage.setItem('hc_v5',JSON.stringify(DB));}catch(e)
 function clearAll(){DB={sessions:[],split:'PPL',streak:0,lastDate:null,goal:'hypertrophy',profile:DB.profile,exercises:[...DEF_EX],measurements:[]};saveDB();renderDash();renderProgress();renderHistory();renderMeasHist();toast('All data cleared');}
 
 const lvlMap=['beginner','intermediate','advanced'],daysMap=[3,4,6],goalMap=['hypertrophy','strength','recomp'],equipMap=['full','home','bodyweight'];
+function skipOnboarding(){document.getElementById('onboarding').style.display='none';document.getElementById('mainApp').style.display='block';initApp();}
 function obSel(s,i,el){obA[s]=i;document.querySelectorAll('#obs'+s+' .ob-opt').forEach(function(b){b.classList.remove('sel');});el.classList.add('sel');}
 function obNext(s){document.getElementById('obs'+s).style.display='none';var nxt=document.getElementById('obs'+(s+1));nxt.style.cssText='display:flex;flex-direction:column;flex:1';document.getElementById('od'+s).classList.add('done');}
 function obBack(s){document.getElementById('obs'+s).style.display='none';document.getElementById('obs'+(s-1)).style.cssText='display:flex;flex-direction:column;flex:1';}
@@ -916,7 +918,7 @@ function doSwapExercise(btn){var name=btn.dataset.exname,old=awExercises[swapTar
 function initApp(){buildTplList();renderDash();renderSettings();renderTemplatesTab();}
 
 loadDB();
-if(DB.sessions.length>0||(DB.profile&&DB.profile.level)){
+if(localStorage.getItem('hc_v5')){
   document.getElementById('onboarding').style.display='none';
   document.getElementById('mainApp').style.display='block';
   initApp();
@@ -924,7 +926,7 @@ if(DB.sessions.length>0||(DB.profile&&DB.profile.level)){
 
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('/HyperCoach/sw.js').then(reg=>{
+    navigator.serviceWorker.register('/HyperCoach/sw.js?v=4').then(reg=>{
       console.log('SW registered');
     }).catch(err=>{
       console.log('SW registration failed:',err);
