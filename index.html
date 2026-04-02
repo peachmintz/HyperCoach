@@ -238,7 +238,7 @@ select.inp{cursor:pointer}
 .warm-chip{display:inline-flex;align-items:center;background:var(--powder-xlt);border:0.5px solid var(--powder);border-radius:var(--r8);padding:5px 10px;font-size:12px;color:var(--ink2);margin:3px;font-weight:500}
 
 /* Bottom nav */
-.bnav{
+.bnav{position:fixed!important;bottom:0!important;left:0!important;right:0!important;z-index:100!important;
   display:flex;justify-content:space-around;
   padding:10px 0;
   padding-bottom:calc(10px + var(--safe-bottom));
@@ -417,6 +417,16 @@ html:not([data-theme="light"]) .btn.brand{background:#2563eb!important;color:#ff
 html:not([data-theme="light"]) .card{background:var(--surface)}
 html:not([data-theme="light"]) .inp{background:var(--surface);color:var(--ink)}
 }
+html[data-theme="dark"] .goal-badge,html[data-theme="dark"] .goal-pill{background:var(--surface2)!important;color:var(--ink)!important;border-color:var(--border2)!important}
+html[data-theme="dark"] .toast{background:#1a3a6b!important;color:var(--ink)!important}
+html[data-theme="dark"] .pill.on,html[data-theme="dark"] .tbtn.on{background:#1a3a6b!important;color:var(--ink)!important;border-color:var(--mid)!important}
+html[data-theme="dark"] .pill:not(.on),html[data-theme="dark"] .tbtn:not(.on){background:var(--surface)!important;color:var(--ink3)!important;border-color:var(--border2)!important}
+html[data-theme="dark"] .nitem.on .nlbl{color:var(--mid)!important}
+html[data-theme="dark"] .nitem .nlbl{color:var(--ink3)!important}
+html[data-theme="dark"] .nitem svg{stroke:var(--ink3)}
+html[data-theme="dark"] .nitem.on svg{stroke:var(--mid)}
+@media(prefers-color-scheme:dark){html:not([data-theme="light"]) .goal-badge,html:not([data-theme="light"]) .goal-pill{background:var(--surface2)!important;color:var(--ink)!important;border-color:var(--border2)!important}html:not([data-theme="light"]) .toast{background:#1a3a6b!important;color:var(--ink)!important}html:not([data-theme="light"]) .pill.on{background:#1a3a6b!important;color:var(--ink)!important}}
+#goalBar{display:none!important}
 /* Onboarding */
 .ob{padding:calc(24px + var(--safe-top)) 24px 24px;min-height:100vh;display:flex;flex-direction:column;background:var(--surface)}
 .ob-prog{display:flex;gap:4px;margin-bottom:28px}
@@ -510,25 +520,17 @@ input[type=number]{-moz-appearance:textfield}
   <div class="logo">Hyper<span>Coach</span></div>
   <div class="topbar-right">
     <div id="goalBadge" class="goal-badge">Hypertrophy</div>
-    <button onclick="toggleDark()" id="darkBtn" style="background:none;border:0.5px solid var(--border2);border-radius:var(--rpill);padding:4px 10px;font-size:13px;cursor:pointer;color:var(--ink3);font-family:inherit;touch-action:manipulation">☀️</button><div class="streak-pill"><div class="streak-dot"></div><span id="streakTxt">0d</span></div>
+    <div class="streak-pill"><div class="streak-dot"></div><span id="streakTxt">0d</span></div>
   </div>
 </div>
 
 <div class="tabbar">
-  <div class="tab on" data-t="dash" onclick="sw('dash',this)">Home</div>
-  <div class="tab" data-t="log" onclick="sw('log',this)">Log</div>
-  <div class="tab" data-t="templates" onclick="sw('templates',this)">Templates</div>
-  <div class="tab" data-t="coach" onclick="sw('coach',this)">Coach</div>
-  <div class="tab" data-t="history" onclick="sw('history',this)">History</div>
-  <div class="tab" data-t="progress" onclick="sw('progress',this)">Progress</div>
-  <div class="tab" data-t="body" onclick="sw('body',this)">Body</div>
-  <div class="tab" data-t="library" onclick="sw('library',this)">Library</div>
-  <div class="tab" data-t="settings" onclick="sw('settings',this)">Settings</div>
+  
 </div>
 
 <!-- HOME -->
 <div class="sec vis" id="tab-dash">
-  <div class="pill-group" id="goalBar"></div>
+  <div class="pill-group" id="goalBar" style="display:none"></div>
   <div id="alerts"></div>
   <div class="stat-grid">
     <div class="stat-card"><div class="stat-lbl">Weekly sets</div><div class="stat-val" id="d-vol">0</div><div class="stat-delta" id="d-vold">—</div></div>
@@ -756,9 +758,25 @@ input[type=number]{-moz-appearance:textfield}
 
 <!-- SETTINGS -->
 <div class="sec" id="tab-settings">
-  <div class="sec-lbl">Profile</div>
+  <div class="sec-lbl">Appearance</div>
+<div class="card" style="padding:0">
+  <div class="setting-row">
+    <div><div class="setting-lbl">Dark mode</div><div class="setting-sub">Switch between light and dark theme</div></div>
+    <button class="btn sm btn-o" id="darkBtn" onclick="toggleDark()" style="touch-action:manipulation">☀️</button>
+  </div>
+</div>
+<div class="sec-lbl">Profile</div>
   <div class="card" style="padding:0 16px">
-    <div class="setting-row"><div><div class="setting-lbl">Experience level</div><div class="setting-sub" id="sLvlSub">—</div></div><select class="inp" style="width:auto" id="sLvl" onchange="updSet('level',this.value)"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select></div>
+    <div class="setting-row"><div><div class="setting-lbl">Experience level</div><div class="setting-sub" id="sLvlSub">—</div>
+  <div class="setting-row">
+    <div><div class="setting-lbl">Training goal</div><div class="setting-sub">Hypertrophy, Strength, or Recomp</div></div>
+    <select class="inp" style="width:auto;padding:4px 8px;font-size:13px" onchange="DB.goal=this.value;saveDB();renderHome(DB.sessions)" id="goalSelect">
+      <option value="hypertrophy">Hypertrophy</option>
+      <option value="strength">Strength</option>
+      <option value="recomp">Recomp</option>
+    </select>
+  </div>
+</div><select class="inp" style="width:auto" id="sLvl" onchange="updSet('level',this.value)"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select></div>
     <div class="setting-row"><div><div class="setting-lbl">Training days</div><div class="setting-sub">Per week</div></div><select class="inp" style="width:auto" id="sDays" onchange="updSet('days',parseInt(this.value))"><option value="3">3 days</option><option value="4">4 days</option><option value="5">5 days</option><option value="6">6 days</option></select></div>
     <div class="setting-row"><div><div class="setting-lbl">Equipment</div></div><select class="inp" style="width:auto" id="sEquip" onchange="updSet('equipment',this.value)"><option value="full">Full gym</option><option value="home">Home gym</option><option value="bodyweight">Bodyweight</option></select></div>
   </div>
@@ -794,10 +812,10 @@ input[type=number]{-moz-appearance:textfield}
 
 <div class="bnav">
   <div class="nitem on" data-n="dash" onclick="sw('dash',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="nlbl">Home</span></div>
-  <div class="nitem" data-n="progress" onclick="sw('progress',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg><span class="nlbl">Progress</span></div>
+  <div class="nitem" data-n="history" onclick="sw('history',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><polyline points="12,7 12,12 15,15"/></svg><span class="nlbl">History</span></div>
   <div class="nitem" data-n="log" onclick="sw('log',this)"><div class="nico-wrap"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div><span class="nlbl">Log</span></div>
-  <div class="nitem" data-n="coach" onclick="sw('coach',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg><span class="nlbl">Coach</span></div>
-  <div class="nitem" data-n="settings" onclick="sw('settings',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="nlbl">Settings</span></div>
+  <div class="nitem" data-n="templates" onclick="sw('templates',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="5" rx="1.5"/><rect x="3" y="11" width="10" height="10" rx="1.5"/><rect x="16" y="11" width="5" height="4" rx="1"/><rect x="16" y="18" width="5" height="3" rx="1"/></svg><span class="nlbl">Templates</span></div>
+  <div class="nitem" data-n="settings" onclick="sw('settings',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg><span class="nlbl">Settings</span></div>
 </div>
 </div>
 
@@ -1087,6 +1105,7 @@ function doSwapExercise(btn){var name=btn.dataset.exname,old=awExercises[swapTar
 function toggleDark(){var d=document.documentElement.getAttribute("data-theme")==="dark";document.documentElement.setAttribute("data-theme",d?"light":"dark");document.getElementById("darkBtn").textContent=d?"☀️":"🌙";try{localStorage.setItem("hc_theme",d?"light":"dark");}catch(e){}}
 function renderDebrief(s){var el=document.getElementById("debriefCard");if(!el)return;var now=Date.now(),ws=s.filter(function(x){return new Date(x.date).getTime()>now-7*86400000;});if(!ws.length){el.innerHTML="<div style='padding:14px 16px;font-size:13px;color:var(--ink3);text-align:center'>Log a session to see your weekly debrief.</div>";return;}var vol={};ws.forEach(function(x){x.exercises.forEach(function(e){var m=EMMAP[e.name];if(m)vol[m]=(vol[m]||0)+(e.sets||0);});});var rows="",over=[],under=[];Object.keys(MVOLS).forEach(function(m){var v=vol[m]||0,mv=MVOLS[m],p=Math.min(100,Math.round(v/mv.mrv*100));var col,sc;if(v===0){col="var(--border2)";sc="var(--ink3)";under.push(m);}else if(v>=mv.mrv){col="#f87171";sc="#f87171";over.push(m);}else if(v>=mv.mav){col="#4ade80";sc="#4ade80";}else if(v>=mv.mev){col="var(--mid)";sc="var(--mid)";}else{col="#fbbf24";sc="#fbbf24";under.push(m);}rows+="<div class='debrief-mrow'><div style='width:88px;font-size:13px;font-weight:500;color:var(--ink);flex-shrink:0'>"+m+"</div><div class='debrief-bar'><div class='debrief-fill' style='width:"+p+"%;background:"+col+"'></div></div><div class='debrief-stat' style='color:"+sc+"'>"+v+"/"+mv.mrv+"</div></div>";});var recs=[],prog=[],stall=[],dl=[];var eh={};s.filter(function(x){return new Date(x.date).getTime()>now-21*86400000;}).forEach(function(x){x.exercises.forEach(function(e){if(!eh[e.name])eh[e.name]=[];eh[e.name].push(e);});});Object.keys(eh).forEach(function(n){var h=eh[n];if(h.length<2)return;var l=h[h.length-1],p2=h[h.length-2];if(l.kg>p2.kg)prog.push(n+" +"+(l.kg-p2.kg).toFixed(1)+"kg");if(l.kg===p2.kg&&l.rir>=3&&p2.rir>=3)stall.push(n);if(h.length>=3&&h.slice(-3).every(function(x){return x.rir<=1;}))dl.push(n);});if(dl.length>=2)recs.push("🚨 <strong>Deload due:</strong> "+dl.slice(0,3).join(", ")+" at RIR≤1 for 3+ weeks.");if(stall.length>=2)recs.push("⚠️ <strong>Push harder:</strong> "+stall.slice(0,3).join(", ")+" stalled.");if(over.length)recs.push("📊 <strong>Over MRV:</strong> "+over.join(", ")+". Cut a set.");if(under.length>=3)recs.push("💡 <strong>Gaps:</strong> "+under.slice(0,4).join(", ")+" under MEV.");if(prog.length)recs.push("⬆️ <strong>Progressed:</strong> "+prog.slice(0,4).join(", ")+".");if(!recs.length)recs.push("✅ <strong>Solid week.</strong> Volume on track.");var tot=ws.reduce(function(a,x){return a+x.exercises.reduce(function(b,e){return b+(e.sets||0);},0);},0);el.innerHTML="<div style='padding:12px 16px 4px;display:flex;align-items:center;gap:8px'><span style='font-size:18px'>📋</span><span style='font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink3)'>Week in review</span></div><div style='padding:0 16px 6px;font-size:12px;color:var(--ink3)'>"+ws.length+" workout"+(ws.length!==1?"s":"")+" · "+tot+" sets</div><div style='padding:0 16px 10px'>"+rows+"</div><div style='padding:0 16px 14px'>"+recs.map(function(r){return"<div class='debrief-rec'>"+r+"</div>";}).join("")+"</div>";}
 function importStrongCSV(file){if(!file)return;var re=document.getElementById("importResult");re.innerHTML="<div style='font-size:13px;color:var(--ink3);padding:8px;text-align:center'>⏳ Importing…</div>";var SM={"Bench Press (Barbell)":"Bench press","Bench Press (Dumbbell)":"Incline DB press","Incline Bench Press (Barbell)":"Incline barbell press","Incline Bench Press (Dumbbell)":"Incline DB press","Incline Bench Press (Smith Machine)":"Smith machine bench press","Incline Bench Press (Cable)":"Cable crossover","Chest Fly":"Dumbbell fly","Incline Chest Fly (Dumbbell)":"Dumbbell fly","Cable Crossover":"Cable crossover","Chest Press (Machine)":"Pec deck fly","Pec Deck (Machine)":"Pec deck fly","Bent Over Row (Barbell)":"Barbell row","Bent Over One Arm Row (Dumbbell)":"Single-arm DB row","T Bar Row":"T-bar row","Seated Row (Cable)":"Cable row","Seated Row (Machine)":"Cable row","Seated Wide-Grip Row (Cable)":"Cable row","Iso-Lateral Row (Machine)":"Chest-supported row","Incline Row (Dumbbell)":"Chest-supported row","Lat Pulldown (Cable)":"Lat pulldown","Lat Pulldown (Machine)":"Lat pulldown","Lat Pulldown (Single Arm)":"Lat pulldown","Pullover (Machine)":"Straight-arm pulldown","Pull Up":"Pull-up (weighted)","Pull Up (Assisted)":"Pull-up (weighted)","Face Pull (Cable)":"Face pulls","Back Extension":"Romanian deadlift","Overhead Press (Dumbbell)":"DB shoulder press","Seated Overhead Press (Dumbbell)":"DB shoulder press","Shoulder Press (Machine)":"Machine shoulder press","Shoulder Press (Plate Loaded)":"Machine shoulder press","Lateral Raise (Dumbbell)":"Lateral raise","Lateral Raise (Cable)":"Cable lateral raise","Lateral Raise (Machine)":"Lateral raise","Reverse Fly (Dumbbell)":"Rear delt fly","Reverse Fly (Cable)":"Cable rear delt fly","Reverse Fly (Machine)":"Rear delt fly","Bicep Curl (Barbell)":"Barbell curl","Bicep Curl (Dumbbell)":"DB curl","Bicep Curl (Cable)":"Cable curl","Bicep Curl (Machine)":"Cable curl","Hammer Curl (Dumbbell)":"Hammer curl","Hammer Curl (Cable)":"Hammer curl","Incline Curl (Dumbbell)":"Incline DB curl","Preacher Curl (Barbell)":"Preacher curl","Preacher Curl (Dumbbell)":"Preacher curl","Preacher Curl (Machine)":"Preacher curl","Reverse Curl (Barbell)":"Reverse curl","Triceps Pushdown (Cable - Straight Bar)":"Tricep pushdown","Triceps Extension (Cable)":"Cable overhead extension","Triceps Extension (Dumbbell)":"DB overhead extension","Triceps Extension (Machine)":"Cable overhead extension","Triceps Extension":"Overhead tricep extension","Triceps Dip":"Dip (triceps)","Skullcrusher (Barbell)":"Skull crusher","Skullcrusher (Dumbbell)":"Skull crusher","Squat (Smith Machine)":"Smith machine squat","Squat (Machine)":"Hack squat","Hack Squat":"Hack squat","Leg Press":"Leg press","Seated Leg Press (Machine)":"Leg press","Leg Extension (Machine)":"Leg extension","Bulgarian Split Squat":"Bulgarian split squat","Goblet Squat (Kettlebell)":"Goblet squat","Lying Leg Curl (Machine)":"Leg curl (machine)","Seated Leg Curl (Machine)":"Seated leg curl","Cable Kickback":"Cable kickback","Glute Kickback (Machine)":"Cable kickback","Cable Crunch":"Cable crunch","Crunch (Machine)":"Crunch","Decline Crunch":"Decline crunch"};var rd=new FileReader();rd.onload=function(ev){try{var lines=ev.target.result.split("\n"),sm={},sk=0;for(var i=1;i<lines.length;i++){var ln=lines[i].trim();if(!ln)continue;var cols=[],cur="",inQ=false;for(var j=0;j<ln.length;j++){var ch=ln[j];if(ch==='"'){inQ=!inQ;}else if(ch===","&&!inQ){cols.push(cur);cur="";}else{cur+=ch;}}cols.push(cur);var dt=(cols[0]||"").trim(),wn=(cols[1]||"").replace(/^"|"$/g,"").trim();var en=(cols[3]||"").replace(/^"|"$/g,"").trim();var wt=parseFloat(cols[5])||0,rp=Math.round(parseFloat(cols[6])||0);if(!dt||!en)continue;var key=dt.substring(0,10)+"|"+wn;if(!sm[key])sm[key]={id:"imp_"+Math.random().toString(36).substring(2,8),name:wn,date:dt.substring(0,10)+"T12:00:00.000Z",goal:DB.goal||"hypertrophy",exercises:{}};var mn=SM[en];if(!mn){var st=en.toLowerCase().replace(/\s*\([^)]+\)/g,"").trim();var fd=DB.exercises.find(function(x){return x.name.toLowerCase().startsWith(st.split(" ")[0]);});mn=fd?fd.name:en;sk++;}if(!sm[key].exercises[mn])sm[key].exercises[mn]={name:mn,sets:0,reps:rp,kg:wt,rir:2};sm[key].exercises[mn].sets++;if(wt>sm[key].exercises[mn].kg){sm[key].exercises[mn].kg=wt;sm[key].exercises[mn].reps=rp;}}var ns=Object.values(sm).map(function(x){return{id:x.id,name:x.name,date:x.date,goal:x.goal,exercises:Object.values(x.exercises)};}).sort(function(a,b){return a.date<b.date?-1:1;});var ek=DB.sessions.reduce(function(acc,x){acc[x.date.substring(0,10)+"|"+x.name]=1;return acc;},{});var added=ns.filter(function(x){return!ek[x.date.substring(0,10)+"|"+x.name];});DB.sessions=DB.sessions.concat(added).sort(function(a,b){return a.date<b.date?-1:1;});saveDB();var f=ns[0]?ns[0].date.substring(0,10):"?",l=ns[ns.length-1]?ns[ns.length-1].date.substring(0,10):"?";re.innerHTML="<div class='import-result ok'>✅ Imported "+added.length+" workouts ("+f+" – "+l+"). "+sk+" kept original name.</div>";renderVolLand(DB.sessions);if(typeof renderDebrief==="function")renderDebrief(DB.sessions);}catch(er){re.innerHTML="<div class='import-result err'>❌ "+er.message+"</div>";}};rd.readAsText(file);}
+function syncGoalSelect(){var el=document.getElementById("goalSelect");if(el)el.value=DB.goal||"hypertrophy";}
 function skipOnboarding(){document.getElementById('onboarding').style.display='none';document.getElementById('mainApp').style.display='block';initApp();}
 function initApp(){buildTplList();renderDash();renderSettings();renderTemplatesTab();}
 
