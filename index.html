@@ -1,3 +1,18 @@
+
+<div class="sec-lbl">Import from Strong</div>
+<div class="card" style="padding:16px">
+  <p style="font-size:13px;color:var(--ink3);margin:0 0 12px">Import your workout history from the Strong app. Export your data from Strong → Settings → Export, then select the CSV file here.</p>
+  <div class="import-zone" id="importZone" onclick="document.getElementById('importFile').click()" 
+       ondragover="event.preventDefault();this.classList.add('drag')"
+       ondragleave="this.classList.remove('drag')"
+       ondrop="event.preventDefault();this.classList.remove('drag');importStrongCSV(event.dataTransfer.files[0])">
+    <div class="import-zone-icon">📂</div>
+    <div class="import-zone-title">Tap to select Strong CSV</div>
+    <div class="import-zone-sub">Or drag and drop your exported file</div>
+  </div>
+  <input type="file" id="importFile" accept=".csv" style="display:none" onchange="importStrongCSV(this.files[0])">
+  <div id="importResult"></div>
+</div>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -407,6 +422,17 @@ html[data-theme="dark"] .aw-header *:not(button){color:var(--ink)!important}
 .debrief-muscle-status{font-size:11px;font-weight:600;width:52px;text-align:right;flex-shrink:0}
 .debrief-empty{padding:14px 16px;font-size:13px;color:var(--ink3);text-align:center}
 html[data-theme="dark"] .debrief-rec{background:var(--surface);border-left-color:var(--mid)}
+
+.import-zone{border:2px dashed var(--border2);border-radius:var(--r12);padding:24px 16px;text-align:center;cursor:pointer;transition:border-color .2s;touch-action:manipulation}
+.import-zone:hover,.import-zone.drag{border-color:var(--mid);background:var(--powder-xlt)}
+.import-zone-icon{font-size:28px;margin-bottom:8px}
+.import-zone-title{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:4px}
+.import-zone-sub{font-size:13px;color:var(--ink3)}
+.import-progress{margin-top:12px;font-size:13px;color:var(--ink3);text-align:center}
+.import-result{border-radius:var(--r8);padding:12px 14px;font-size:13px;margin-top:12px;line-height:1.5}
+.import-result.ok{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border)}
+.import-result.err{background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border)}
+html[data-theme="dark"] .import-zone-title{color:var(--ink)}
 /* Onboarding */
 .ob{padding:calc(24px + var(--safe-top)) 24px 24px;min-height:100vh;display:flex;flex-direction:column;background:var(--surface)}
 .ob-prog{display:flex;gap:4px;margin-bottom:28px}
@@ -1074,6 +1100,117 @@ function closeSwapModal(){document.getElementById("swapModal").style.display="no
 function renderSwapList(){var q=(document.getElementById("swapSearch").value||"").toLowerCase(),cur=awExercises[swapTargetExIdx]?awExercises[swapTargetExIdx].name:"";var filtered=DB.exercises.filter(function(e){return e.name!==cur&&(e.name.toLowerCase().includes(q)||e.muscle.toLowerCase().includes(q));});var groups={};filtered.forEach(function(e){if(!groups[e.muscle])groups[e.muscle]=[];groups[e.muscle].push(e);});document.getElementById("swapList").innerHTML=Object.entries(groups).map(function(entry){var muscle=entry[0],exs=entry[1];return '<div style="padding:10px 0 4px;font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em">'+ muscle+"</div>"+exs.map(function(ex){return '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:0.5px solid var(--border)"><div><div style="font-size:14px;font-weight:500;color:var(--ink)">'+ ex.name+'</div><div style="font-size:12px;color:var(--ink3)">'+ ex.type+'</div></div><button class="btn sm brand" style="margin:0;padding:7px 14px;touch-action:manipulation" data-exname="'+ ex.name.replace(/"/g,"&quot;")+'" onclick="doSwapExercise(this)">Swap</button></div>';}).join("");}).join("")||'<div style="padding:20px 0;text-align:center;font-size:13px;color:var(--ink3)">No exercises found</div>';}
 function doSwapExercise(btn){var name=btn.dataset.exname,old=awExercises[swapTargetExIdx];awExercises[swapTargetExIdx]={name:name,sets:old.sets.map(function(s){return Object.assign({},s,{done:false});})};closeSwapModal();renderActiveWorkout();toast("Swapped to "+name);}
 function toggleDark(){var d=document.documentElement.getAttribute("data-theme")==="dark";document.documentElement.setAttribute("data-theme",d?"light":"dark");document.getElementById("darkBtn").textContent=d?"☀️":"🌙";try{localStorage.setItem("hc_theme",d?"light":"dark");}catch(e){}}
+
+function importStrongCSV(file){
+  if(!file) return;
+  var resultEl = document.getElementById('importResult');
+  resultEl.innerHTML = '<div class="import-progress">⏳ Reading file…</div>';
+
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      var text = e.target.result;
+      var lines = text.split('\n');
+      var headers = lines[0].split(',').map(function(h){ return h.trim().replace(/^"|"$/g,''); });
+      var dateIdx=0, nameIdx=1, exIdx=3, setIdx=4, wtIdx=5, repIdx=6;
+
+      // Group rows by date+workoutName into sessions
+      var sessionMap = {};
+      var skipped = 0;
+
+      for(var i=1;i<lines.length;i++){
+        var line = lines[i].trim();
+        if(!line) continue;
+        // Parse CSV row handling quoted fields
+        var cols = [];
+        var cur='', inQ=false;
+        for(var ci=0;ci<line.length;ci++){
+          var ch=line[ci];
+          if(ch==='"'){inQ=!inQ;}
+          else if(ch===','&&!inQ){cols.push(cur);cur='';}
+          else{cur+=ch;}
+        }
+        cols.push(cur);
+
+        var date = (cols[dateIdx]||'').trim();
+        var wkName = (cols[nameIdx]||'').trim().replace(/^"|"$/g,'');
+        var exName = (cols[exIdx]||'').trim().replace(/^"|"$/g,'');
+        var weight = parseFloat(cols[wtIdx]||0)||0;
+        var reps = Math.round(parseFloat(cols[repIdx]||0)||0);
+
+        if(!date||!exName) continue;
+
+        var sessionKey = date.substring(0,10)+'|'+wkName;
+        if(!sessionMap[sessionKey]){
+          sessionMap[sessionKey] = {
+            id: 'imp_'+date.substring(0,10).replace(/-/g,'')+'_'+Math.random().toString(36).substring(2,6),
+            name: wkName,
+            date: date.substring(0,10)+'T12:00:00.000Z',
+            goal: DB.goal||'hypertrophy',
+            exercises: {}
+          };
+        }
+
+        // Map exercise name
+        var STRONG_MAP = {"Bench Press (Barbell)":"Bench press","Bench Press (Dumbbell)":"Incline DB press","Incline Bench Press (Barbell)":"Incline barbell press","Incline Bench Press (Dumbbell)":"Incline DB press","Incline Bench Press (Smith Machine)":"Smith machine bench press","Incline Bench Press (Cable)":"Cable crossover","Chest Fly":"Dumbbell fly","Incline Chest Fly (Dumbbell)":"Dumbbell fly","Cable Crossover":"Cable crossover","Chest Press (Machine)":"Pec deck fly","Incline Chest Press (Machine)":"Pec deck fly","Pec Deck (Machine)":"Pec deck fly","Bent Over Row (Barbell)":"Barbell row","Bent Over One Arm Row (Dumbbell)":"Single-arm DB row","T Bar Row":"T-bar row","Seated Row (Cable)":"Cable row","Seated Row (Machine)":"Cable row","Seated Wide-Grip Row (Cable)":"Cable row","Iso-Lateral Row (Machine)":"Chest-supported row","Incline Row (Dumbbell)":"Chest-supported row","Lat Pulldown (Cable)":"Lat pulldown","Lat Pulldown (Machine)":"Lat pulldown","Lat Pulldown (Single Arm)":"Lat pulldown","Pullover (Machine)":"Straight-arm pulldown","Pull Up":"Pull-up (weighted)","Pull Up (Assisted)":"Pull-up (weighted)","Face Pull (Cable)":"Face pulls","Back Extension":"Romanian deadlift","Overhead Press (Dumbbell)":"DB shoulder press","Seated Overhead Press (Dumbbell)":"DB shoulder press","Shoulder Press (Machine)":"Machine shoulder press","Shoulder Press (Plate Loaded)":"Machine shoulder press","Lateral Raise (Dumbbell)":"Lateral raise","Lateral Raise (Cable)":"Cable lateral raise","Lateral Raise (Machine)":"Lateral raise","Reverse Fly (Dumbbell)":"Rear delt fly","Reverse Fly (Cable)":"Cable rear delt fly","Reverse Fly (Machine)":"Rear delt fly","Bicep Curl (Barbell)":"Barbell curl","Bicep Curl (Dumbbell)":"DB curl","Bicep Curl (Cable)":"Cable curl","Bicep Curl (Machine)":"Cable curl","Hammer Curl (Dumbbell)":"Hammer curl","Hammer Curl (Cable)":"Hammer curl","Incline Curl (Dumbbell)":"Incline DB curl","Preacher Curl (Barbell)":"Preacher curl","Preacher Curl (Dumbbell)":"Preacher curl","Preacher Curl (Machine)":"Preacher curl","Reverse Curl (Barbell)":"Reverse curl","Triceps Pushdown (Cable - Straight Bar)":"Tricep pushdown","Triceps Extension (Cable)":"Cable overhead extension","Triceps Extension (Dumbbell)":"DB overhead extension","Triceps Extension (Machine)":"Cable overhead extension","Triceps Extension":"Overhead tricep extension","Triceps Dip":"Dip (triceps)","Skullcrusher (Barbell)":"Skull crusher","Skullcrusher (Dumbbell)":"Skull crusher","Squat (Smith Machine)":"Smith machine squat","Squat (Machine)":"Hack squat","Hack Squat":"Hack squat","Leg Press":"Leg press","Seated Leg Press (Machine)":"Leg press","Leg Extension (Machine)":"Leg extension","Bulgarian Split Squat":"Bulgarian split squat","Goblet Squat (Kettlebell)":"Goblet squat","Lying Leg Curl (Machine)":"Leg curl (machine)","Seated Leg Curl (Machine)":"Seated leg curl","Cable Kickback":"Cable kickback","Glute Kickback (Machine)":"Cable kickback","Cable Crunch":"Cable crunch","Crunch (Machine)":"Crunch","Decline Crunch":"Decline crunch"};
+        var mappedName = STRONG_MAP[exName];
+        if(!mappedName){
+          // Try fuzzy: strip parentheses, lowercase match
+          var stripped = exName.toLowerCase().replace(/\s*\([^)]+\)/g,'').trim();
+          var found = DB.exercises.find(function(ex){
+            return ex.name.toLowerCase().includes(stripped) || stripped.includes(ex.name.toLowerCase().split(' ')[0]);
+          });
+          if(found) mappedName = found.name;
+          else { skipped++; mappedName = exName; } // keep original name
+        }
+
+        // Group sets per exercise within session
+        if(!sessionMap[sessionKey].exercises[mappedName]){
+          sessionMap[sessionKey].exercises[mappedName] = {name:mappedName, sets:0, reps:reps, kg:weight, rir:2};
+        }
+        sessionMap[sessionKey].exercises[mappedName].sets++;
+        // Use max weight as the session weight for that exercise
+        if(weight > sessionMap[sessionKey].exercises[mappedName].kg){
+          sessionMap[sessionKey].exercises[mappedName].kg = weight;
+          sessionMap[sessionKey].exercises[mappedName].reps = reps;
+        }
+      }
+
+      // Convert to sessions array
+      var newSessions = Object.values(sessionMap).map(function(s){
+        return {
+          id: s.id, name: s.name, date: s.date, goal: s.goal,
+          exercises: Object.values(s.exercises)
+        };
+      }).sort(function(a,b){ return a.date < b.date ? -1 : 1; });
+
+      // Merge with existing — don't duplicate dates+names
+      var existingKeys = DB.sessions.reduce(function(acc,s){
+        acc[s.date.substring(0,10)+'|'+s.name]=true; return acc;
+      },{});
+      var added = newSessions.filter(function(s){
+        return !existingKeys[s.date.substring(0,10)+'|'+s.name];
+      });
+
+      DB.sessions = DB.sessions.concat(added).sort(function(a,b){ return a.date<b.date?-1:1; });
+      saveDB();
+
+      resultEl.innerHTML = '<div class="import-result ok">'
+        +'✅ Imported '+added.length+' workouts ('+(lines.length-1)+' sets) from '+
+        (newSessions[0]?newSessions[0].date.substring(0,10):'?')+' to '+
+        (newSessions[newSessions.length-1]?newSessions[newSessions.length-1].date.substring(0,10):'?')
+        +'.<br>'+skipped+' exercises had no exact match and were imported with their original name.</div>';
+
+      // Refresh home tab
+      renderVolLand(DB.sessions);
+      renderDebrief(DB.sessions);
+
+    } catch(err) {
+      resultEl.innerHTML = '<div class="import-result err">❌ Error: '+err.message+'</div>';
+    }
+  };
+  reader.readAsText(file);
+}
 function skipOnboarding(){document.getElementById('onboarding').style.display='none';document.getElementById('mainApp').style.display='block';initApp();}
 
 function renderDebrief(sessions){
