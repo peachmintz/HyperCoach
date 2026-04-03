@@ -1241,7 +1241,7 @@ el.innerHTML='<div class="sec-lbl">Weekly Schedule</div>'
 +'</div>';
 buildSchedule();}
 function skipOnboarding(){document.getElementById('onboarding').style.display='none';document.getElementById('mainApp').style.display='block';initApp();}
-function initApp(){buildTplList();renderDash();renderSettings();renderTemplatesTab();}
+function initApp(){renderDash();renderSettings();renderTemplatesTab();}
 
 try{var _t=localStorage.getItem("hc_theme");if(_t==="dark"){document.documentElement.setAttribute("data-theme","dark");var _db=document.getElementById("darkBtn");if(_db)_db.textContent="🌙";}}catch(e){}
 loadDB();
