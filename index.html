@@ -246,7 +246,7 @@ select.inp{cursor:pointer}
   border-top:0.5px solid var(--border);
   position:sticky;bottom:0;
 }
-.nitem{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 14px;border-radius:var(--r8);min-width:44px;-webkit-tap-highlight-color:transparent}
+.nitem{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 14px;border-radius:var(--r8);min-width:44px;-webkit-tap-highlight-color:transparenttouch-action:manipulation;}
 .nitem.on .nico{color:var(--mid)}
 .nitem.on .nlbl{color:var(--ink2);font-weight:600}
 .nico{width:22px;height:22px;color:var(--ink3)}
@@ -835,11 +835,11 @@ input[type=number]{-moz-appearance:textfield}
 </div>
 
 <div class="bnav">
-  <div class="nitem on" data-n="dash" onclick="sw('dash',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="nlbl">Home</span></div>
-  <div class="nitem" data-n="history" onclick="sw('history',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><polyline points="12,7 12,12 15,15"/></svg><span class="nlbl">History</span></div>
-  <div class="nitem" data-n="log" onclick="sw('log',this)"><div class="nico-wrap"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div><span class="nlbl">Log</span></div>
-  <div class="nitem" data-n="progress" onclick="sw('progress',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg><span class="nlbl">Progress</span></div>
-  <div class="nitem" data-n="settings" onclick="sw('settings',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="nlbl">Settings</span></div>
+  <div class="nitem on" ontouchstart="" data-n="dash" onclick="sw('dash',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span class="nlbl">Home</span></div>
+  <div class="nitem" ontouchstart="" data-n="history" onclick="sw('history',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><polyline points="12,7 12,12 15,15"/></svg><span class="nlbl">History</span></div>
+  <div class="nitem" ontouchstart="" data-n="log" onclick="sw('log',this)"><div class="nico-wrap"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div><span class="nlbl">Log</span></div>
+  <div class="nitem" ontouchstart="" data-n="progress" onclick="sw('progress',this)"><svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg><span class="nlbl">Progress</span></div>
+  <div class="nitem" ontouchstart="" data-n="settings" onclick="sw('settings',this)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="nlbl">Settings</span></div>
   
 </div>
 </div>
@@ -900,19 +900,20 @@ function obBack(s){document.getElementById('obs'+s).style.display='none';documen
 function obFinish(){DB.profile={level:lvlMap[obA[0]],days:daysMap[obA[1]],equipment:equipMap[obA[3]]};DB.goal=goalMap[obA[2]];saveDB();document.getElementById('onboarding').style.display='none';document.getElementById('mainApp').style.display='block';initApp();}
 
 function sw(name,el){
-  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('vis'));renderTplCards();
+  if(document.getElementById("activeWorkout").style.display==="block")return;
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('vis'));setTimeout(function(){renderTplCards();},0);
   document.getElementById('tab-'+name).classList.add('vis');
   document.querySelectorAll('.tab,.nitem').forEach(t=>t.classList.remove('on'));
   const t=document.querySelector('.tab[data-t="'+name+'"]');if(t)t.classList.add('on');
   if(el&&el.dataset){if(el.dataset.n)el.classList.add('on');else{const ni=document.querySelector('.nitem[data-n="'+name+'"]');if(ni)ni.classList.add('on');}}
-  if(name==='dash')renderDash();
-  if(name==='progress')renderProgress();
-  if(name==='history')renderHistory();
+  if(name==='dash')setTimeout(function(){renderDash();},0);
+  if(name==='progress')setTimeout(function(){renderProgress();},0);
+  if(name==='history')setTimeout(function(){renderHistory();},0);
   if(name==='library')renderLib();
   if(name==='body'){renderMeasHist();renderBodyChart();}
-  if(name==='settings')renderSettings();
+  if(name==='settings')setTimeout(function(){renderSettings();},0);
   if(name==='coach')renderCoach();
-  if(name==='templates')renderTemplatesTab();
+  if(name==='templates')setTimeout(function(){renderTemplatesTab();},0);
   if(name==='log')buildTplList();
 }
 
