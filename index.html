@@ -485,10 +485,11 @@ select.inp{cursor:pointer}
 .settings-hdr-title{font-size:var(--fs-lg);font-weight:700;color:var(--ink)}
 .settings-close-btn{
   width:32px;height:32px;border-radius:50%;background:var(--surface2);
-  border:none;cursor:pointer;color:var(--ink3);font-size:20px;
+  border:none;cursor:pointer;color:var(--ink3);font-size:16px;
   font-family:inherit;touch-action:manipulation;
   -webkit-tap-highlight-color:transparent;
   display:flex;align-items:center;justify-content:center;
+  line-height:1;padding:0;
 }
 .settings-body{padding:0 22px}
 .settings-sec-lbl{
@@ -908,7 +909,7 @@ input[type=number]{-moz-appearance:textfield}
       <div class="settings-sec-lbl">Appearance</div>
       <div class="srow">
         <div class="srow-lbl">Dark mode</div>
-        <button class="btn sm btn-o" id="darkBtn" onclick="toggleDark()" style="margin:0;touch-action:manipulation">&#127769; Dark</button>
+        <button class="btn sm btn-o" id="darkBtn" onclick="toggleDark()" ontouchend="toggleDark();this.blur();return false;" style="margin:0;touch-action:manipulation">&#127769; Dark</button>
       </div>
 
       <div class="settings-sec-lbl">Profile</div>
@@ -967,7 +968,7 @@ input[type=number]{-moz-appearance:textfield}
         <div><div class="srow-lbl">Export history</div><div class="srow-sub">Download sessions as CSV</div></div>
         <button class="btn sm btn-o" style="margin:0" onclick="exportCSV()">Export</button>
       </div>
-      <div class="srow" style="flex-direction:column;align-items:flex-start;gap:10px">
+      <div class="srow" style="flex-direction:column;align-items:center;gap:10px;text-align:center">
         <div class="srow-lbl">Import from Strong</div>
         <p style="font-size:var(--fs-sm);color:var(--ink3);margin:0">In Strong, go to Settings &rarr; Export, then upload the CSV here.</p>
         <div class="import-zone" id="importZone" onclick="document.getElementById('importFile').click()">
@@ -1637,7 +1638,9 @@ function updateDarkBtn(){
   var btn=document.getElementById('darkBtn');
   if(btn)btn.innerHTML=dark?'&#9728;&#65039; Light':'&#127769; Dark';
 }
+var _darkThrottle=0;
 function toggleDark(){
+  var now=Date.now();if(now-_darkThrottle<400)return;_darkThrottle=now;
   var dark=document.documentElement.getAttribute('data-theme')==='dark';
   document.documentElement.setAttribute('data-theme',dark?'light':'dark');
   localStorage.setItem('hc_theme',dark?'light':'dark');
