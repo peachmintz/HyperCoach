@@ -85,7 +85,7 @@ html[data-theme="dark"]{
   --nav-icon-color:#8ab4d8;--nav-icon-active:#4a9eff;
 }
 
-html{height:100%;background:#011f4b;font-size:20px}
+html{height:100%;background:var(--surface);font-size:20px}
 body{
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   font-size:var(--fs-base);
@@ -97,7 +97,6 @@ body{
 /* ===== APP SHELL ===== */
 .app{
   max-width:480px;margin:0 auto;
-  /* FIX 5: use padding-bottom with safe-bottom so nav sits flush */
   padding-top:var(--safe-top);
   padding-bottom:calc(72px + var(--safe-bottom));
   background:var(--surface2);min-height:100vh;min-height:-webkit-fill-available;
@@ -109,6 +108,11 @@ body{
   padding:var(--sp-md) var(--sp-lg) var(--sp-sm);
   border-bottom:0.5px solid var(--border);background:var(--surface);
   position:sticky;top:0;z-index:50;
+  /* Break out of .app max-width to fill full screen */
+  width:100vw;margin-left:calc(-1 * max(0px,(100vw - 480px)/2));
+  box-sizing:border-box;
+  padding-left:max(var(--sp-lg), calc((100vw - 480px)/2 + var(--sp-lg)));
+  padding-right:max(var(--sp-lg), calc((100vw - 480px)/2 + var(--sp-lg)));
 }
 .logo{font-size:var(--fs-xl);font-weight:700;color:var(--ink);letter-spacing:-0.02em}
 .logo span{color:var(--mid)}
@@ -330,33 +334,32 @@ select.inp{cursor:pointer}
 /* ===== BOTTOM NAV — FIX 5: flush to bottom ===== */
 .bnav{
   position:fixed;bottom:0;left:0;right:0;z-index:100;
-  display:flex;justify-content:space-around;align-items:flex-end;
-  /* fill safe area so nav sits flush on notched iPhones */
-  padding:12px 0 0;
+  display:flex;justify-content:space-around;align-items:center;
+  padding:8px 0;
   padding-bottom:max(var(--safe-bottom), 8px);
   background:var(--surface);
   border-top:0.5px solid var(--border);
 }
 .nitem{
-  display:flex;flex-direction:column;align-items:center;gap:4px;
-  cursor:pointer;padding:4px 16px;border-radius:var(--r8);
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;padding:4px 12px;border-radius:var(--r8);
   min-width:52px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;
 }
-.nitem .nico{width:30px;height:30px;color:var(--nav-icon-color);stroke:var(--nav-icon-color)}
-.nitem .nlbl{font-size:0.65rem;font-weight:500;color:var(--nav-icon-color)}
+.nitem .nico{width:26px;height:26px;color:var(--nav-icon-color);stroke:var(--nav-icon-color)}
+.nitem .nlbl{font-size:0.6rem;font-weight:500;color:var(--nav-icon-color)}
 .nitem.on .nico{color:var(--nav-icon-active);stroke:var(--nav-icon-active)}
 .nitem.on .nlbl{color:var(--ink2);font-weight:700}
 
 /* Log centre button */
 .nitem[data-n="log"]{padding:4px 10px}
 .nitem[data-n="log"] .nico-wrap{
-  width:62px;height:62px;background:var(--nico-wrap-bg);border-radius:50%;
+  width:54px;height:54px;background:var(--nico-wrap-bg);border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  margin-bottom:3px;box-shadow:0 3px 12px rgba(1,31,75,0.35);
+  box-shadow:0 3px 12px rgba(1,31,75,0.35);
 }
-.nitem[data-n="log"] .nico{width:30px;height:30px;color:#fff;stroke:#fff}
+.nitem[data-n="log"] .nico{width:26px;height:26px;color:#fff;stroke:#fff}
 .nitem[data-n="log"].on .nico-wrap{background:var(--mid)}
-.nitem[data-n="log"] .nlbl{color:var(--ink);font-weight:700;font-size:11px}
+.nitem[data-n="log"] .nlbl{color:var(--ink);font-weight:700;font-size:10px}
 
 /* ===== TEMPLATE GRID (FIX 4) ===== */
 .tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 0 12px}
@@ -564,11 +567,6 @@ input[type=number]{-moz-appearance:textfield}
 
 <div class="topbar">
   <div class="logo">Hyper<span>Coach</span></div>
-  <div class="topbar-right">
-    <div id="goalBadge" class="goal-badge">Hypertrophy</div>
-    <!-- FIX 6: streak in weeks -->
-    <div class="streak-pill"><div class="streak-dot"></div><span id="streakTxt">0 wks</span></div>
-  </div>
 </div>
 
 <!-- HOME — FIX 1: removed weekly debrief; FIX 2: removed recovery check-in -->
@@ -1061,7 +1059,7 @@ function sw(name,el){
 // GOAL
 // ============================================================
 function renderGoalBar(){
-  document.getElementById('goalBadge').textContent=GOAL_CFG[DB.goal].label;
+  // goalBadge removed from topbar
 }
 
 // ============================================================
@@ -1147,7 +1145,6 @@ function renderDash(){
   // FIX 6: week streak
   var wkStreak=calcWeekStreak(s);
   document.getElementById('d-streak').innerHTML=wkStreak+'<span class="stat-unit">wk</span>';
-  document.getElementById('streakTxt').textContent=wkStreak+' wk'+(wkStreak!==1?'s':'');
   // bench PR
   var bs=s.flatMap(x=>x.exercises.filter(e=>e.name==='Bench press'));
   if(bs.length){var best=bs.reduce((a,b)=>b.kg>a.kg?b:a);document.getElementById('d-bench').innerHTML=best.kg+'<span class="stat-unit">kg</span>';if(bs.length>1){var p2=bs[bs.length-2];document.getElementById('d-benchd').textContent=(best.kg>=p2.kg?'+':'')+(best.kg-p2.kg).toFixed(1)+' kg from last';}}
@@ -1482,7 +1479,27 @@ function stopCTimer(){clearInterval(ctInt);ctRun=false;['ctDisp','ctLbl','ctBtns
 function renderHistory(){
   var el=document.getElementById('histList');
   if(!DB.sessions.length){el.innerHTML='<div style="padding:16px 0;font-size:var(--fs-sm);color:var(--ink3)">No sessions logged yet.</div>';return;}
-  el.innerHTML=[...DB.sessions].reverse().map((s,ri)=>{var i=DB.sessions.length-1-ri,d=new Date(s.date);return'<div class="hist-item" onclick="toggleHist('+i+')"><div class="hist-head"><span class="hist-name">'+s.name+'</span><span class="hist-date">'+d.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})+'</span></div><div class="hist-meta">'+s.exercises.reduce((a,e)=>a+e.sets,0)+' sets &middot; '+s.exercises.length+' exercises</div><div class="hist-detail" id="hd'+i+'">'+s.exercises.map(e=>'<div class="hist-ex"><span class="hist-ex-name">'+e.name+'</span><span class="hist-ex-val">'+e.sets+'&times;'+e.reps+' @ '+e.kg+' kg</span></div>').join('')+'</div></div>';}).join('');
+  el.innerHTML=[...DB.sessions].reverse().map((s,ri)=>{
+    var i=DB.sessions.length-1-ri,d=new Date(s.date);
+    return '<div class="hist-item">'
+      +'<div class="hist-head" onclick="toggleHist('+i+')" style="cursor:pointer">'
+        +'<span class="hist-name">'+s.name+'</span>'
+        +'<span class="hist-date">'+d.toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'})+'</span>'
+      +'</div>'
+      +'<div class="hist-meta" style="display:flex;align-items:center;justify-content:space-between">'
+        +'<span>'+s.exercises.reduce((a,e)=>a+e.sets,0)+' sets &middot; '+s.exercises.length+' exercises</span>'
+        +'<button onclick="deleteSession('+i+')" style="background:none;border:none;color:var(--ink3);font-size:var(--fs-xs);cursor:pointer;padding:4px 0 4px 12px;font-family:inherit;touch-action:manipulation;-webkit-tap-highlight-color:transparent" title="Delete workout">Delete</button>'
+      +'</div>'
+      +'<div class="hist-detail" id="hd'+i+'">'+s.exercises.map(e=>'<div class="hist-ex"><span class="hist-ex-name">'+e.name+'</span><span class="hist-ex-val">'+e.sets+'&times;'+e.reps+' @ '+e.kg+' kg</span></div>').join('')+'</div>'
+    +'</div>';
+  }).join('');
+}
+function deleteSession(i){
+  var s=DB.sessions[i];
+  if(!confirm('Delete "'+s.name+'" on '+new Date(s.date).toLocaleDateString('en-AU',{day:'numeric',month:'short'})+' ?'))return;
+  DB.sessions.splice(i,1);
+  saveDB();renderHistory();renderDash();renderProgress();
+  toast('Workout deleted');
 }
 function toggleHist(i){document.getElementById('hd'+i).classList.toggle('open');}
 function exportCSV(){if(!DB.sessions.length){toast('No sessions to export');return;}var rows=['Date,Session,Exercise,Sets,Reps,Weight (kg),RIR'];DB.sessions.forEach(s=>{var d=new Date(s.date).toLocaleDateString('en-AU');s.exercises.forEach(e=>rows.push([d,s.name,e.name,e.sets,e.reps,e.kg,e.rir].join(',')));});var blob=new Blob([rows.join('\n')],{type:'text/csv'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='hypercoach.csv';a.click();URL.revokeObjectURL(url);toast('CSV exported!');}
