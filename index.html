@@ -465,6 +465,43 @@ select.inp{cursor:pointer}
 }
 .modal-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:14px auto 20px}
 
+
+/* ===== SETTINGS OVERLAY ===== */
+.settings-overlay{
+  position:fixed;inset:0;background:rgba(1,31,75,0.65);z-index:500;
+  display:none;align-items:flex-end;justify-content:center;
+}
+.settings-overlay.open{display:flex}
+.settings-sheet{
+  background:var(--surface);border-radius:var(--r20) var(--r20) 0 0;
+  width:100%;max-width:480px;max-height:92vh;
+  overflow-y:auto;padding-bottom:calc(24px + var(--safe-bottom));
+}
+.settings-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 22px 16px;border-bottom:0.5px solid var(--border);
+  position:sticky;top:0;background:var(--surface);z-index:10;
+}
+.settings-hdr-title{font-size:var(--fs-lg);font-weight:700;color:var(--ink)}
+.settings-close-btn{
+  width:32px;height:32px;border-radius:50%;background:var(--surface2);
+  border:none;cursor:pointer;color:var(--ink3);font-size:20px;
+  font-family:inherit;touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+  display:flex;align-items:center;justify-content:center;
+}
+.settings-body{padding:0 22px}
+.settings-sec-lbl{
+  font-size:var(--fs-xs);font-weight:700;color:var(--ink3);
+  text-transform:uppercase;letter-spacing:.07em;margin:20px 0 2px;
+}
+.srow{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 0;border-bottom:0.5px solid var(--border);
+}
+.srow:last-child{border-bottom:none}
+.srow-lbl{font-size:var(--fs-base);color:var(--ink);font-weight:600}
+.srow-sub{font-size:var(--fs-sm);color:var(--ink3);margin-top:2px}
 /* Schedule */
 .sched-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:16px}
 .sched-day{border-radius:var(--r8);padding:10px 2px;text-align:center;cursor:pointer;touch-action:manipulation;border:1.5px solid var(--border2);transition:all .15s}
@@ -859,63 +896,96 @@ input[type=number]{-moz-appearance:textfield}
 </div>
 
 <!-- SETTINGS -->
-<div class="sec" id="tab-settings">
-  <div class="sec-lbl">Appearance</div>
-  <div class="card" style="padding:0 18px">
-    <div class="setting-row">
-      <div><div class="setting-lbl">Dark mode</div><div class="setting-sub">Switch between light and dark theme</div></div>
-      <button class="btn sm btn-o" id="darkBtn" onclick="toggleDark()" style="touch-action:manipulation">&#9728;&#65039;</button>
+<!-- SETTINGS OVERLAY -->
+<div class="settings-overlay" id="settingsOverlay" onclick="closeSettingsIfBg(event)">
+  <div class="settings-sheet">
+    <div class="settings-hdr">
+      <div class="settings-hdr-title">Settings</div>
+      <button class="settings-close-btn" onclick="closeSettings()">&times;</button>
     </div>
-  </div>
-  <div id="schedSection"></div>
-  <div class="sec-lbl">Profile</div>
-  <div class="card" style="padding:0 18px">
-    <div class="setting-row">
-      <div><div class="setting-lbl">Training goal</div><div class="setting-sub">Hypertrophy, Strength, or Recomp</div></div>
-      <select class="inp" style="width:auto;padding:5px 10px;font-size:var(--fs-sm)" onchange="DB.goal=this.value;saveDB();renderDash()" id="goalSelect"><option value="hypertrophy">Hypertrophy</option><option value="strength">Strength</option><option value="recomp">Recomp</option></select>
+    <div class="settings-body">
+
+      <div class="settings-sec-lbl">Appearance</div>
+      <div class="srow">
+        <div class="srow-lbl">Dark mode</div>
+        <button class="btn sm btn-o" id="darkBtn" onclick="toggleDark()" style="margin:0;touch-action:manipulation">&#127769; Dark</button>
+      </div>
+
+      <div class="settings-sec-lbl">Profile</div>
+      <div class="srow">
+        <div class="srow-lbl">Training goal</div>
+        <select class="inp" style="width:auto;padding:5px 10px;font-size:var(--fs-sm)" onchange="DB.goal=this.value;saveDB();renderDash()" id="goalSelect">
+          <option value="hypertrophy">Hypertrophy</option><option value="strength">Strength</option><option value="recomp">Recomp</option>
+        </select>
+      </div>
+      <div class="srow">
+        <div><div class="srow-lbl">Experience</div><div class="srow-sub" id="sLvlSub">&mdash;</div></div>
+        <select class="inp" style="width:auto" id="sLvl" onchange="updSet('level',this.value)">
+          <option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option>
+        </select>
+      </div>
+      <div class="srow">
+        <div><div class="srow-lbl">Training days</div><div class="srow-sub">Per week</div></div>
+        <select class="inp" style="width:auto" id="sDays" onchange="updSet('days',parseInt(this.value))">
+          <option value="3">3 days</option><option value="4">4 days</option><option value="5">5 days</option><option value="6">6 days</option>
+        </select>
+      </div>
+      <div class="srow">
+        <div class="srow-lbl">Equipment</div>
+        <select class="inp" style="width:auto" id="sEquip" onchange="updSet('equipment',this.value)">
+          <option value="full">Full gym</option><option value="home">Home gym</option><option value="bodyweight">Bodyweight</option>
+        </select>
+      </div>
+
+      <div id="schedSection"></div>
+
+      <div class="settings-sec-lbl">Recommended split</div>
+      <div id="splitRec" style="font-size:var(--fs-sm);color:var(--ink2);padding:10px 0 14px;border-bottom:0.5px solid var(--border)"></div>
+
+      <div class="settings-sec-lbl">Training splits</div>
+      <div class="split-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px"><div class="split-name">Push / Pull / Legs</div><span class="badge bb">5&ndash;6 days</span></div>
+        <div class="split-desc">Highest frequency per muscle group. Ideal for intermediate to advanced lifters.</div>
+        <div class="day-row"><div class="day-lbl">Mon</div><div>Push A</div></div><div class="day-row"><div class="day-lbl">Tue</div><div>Pull A</div></div><div class="day-row"><div class="day-lbl">Wed</div><div>Legs A</div></div><div class="day-row"><div class="day-lbl">Thu</div><div>Push B</div></div><div class="day-row"><div class="day-lbl">Fri</div><div>Pull B</div></div><div class="day-row"><div class="day-lbl">Sat</div><div>Legs B</div></div><div class="day-row"><div class="day-lbl">Sun</div><div class="day-rest">Rest</div></div>
+        <button class="btn btn-o" onclick="DB.split='PPL';saveDB();toast('PPL activated')">Use this split</button>
+      </div>
+      <div class="split-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px"><div class="split-name">Upper / Lower</div><span class="badge bs">4 days</span></div>
+        <div class="split-desc">Each muscle hit twice per week with full recovery between sessions.</div>
+        <div class="day-row"><div class="day-lbl">Mon</div><div>Upper A</div></div><div class="day-row"><div class="day-lbl">Tue</div><div>Lower A</div></div><div class="day-row"><div class="day-lbl">Thu</div><div>Upper B</div></div><div class="day-row"><div class="day-lbl">Fri</div><div>Lower B</div></div><div class="day-row"><div class="day-lbl">Rest</div><div class="day-rest">Wed / Sat / Sun</div></div>
+        <button class="btn btn-o" onclick="DB.split='Upper/Lower';saveDB();toast('Upper/Lower activated')">Use this split</button>
+      </div>
+      <div class="split-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px"><div class="split-name">Full body (3-day)</div><span class="badge bn">3 days</span></div>
+        <div class="split-desc">Maximum frequency per session. Best for beginners or limited schedules.</div>
+        <div class="day-row"><div class="day-lbl">Mon</div><div>Full body A</div></div><div class="day-row"><div class="day-lbl">Wed</div><div>Full body B</div></div><div class="day-row"><div class="day-lbl">Fri</div><div>Full body C</div></div>
+        <button class="btn btn-o" onclick="DB.split='Full Body';saveDB();toast('Full Body activated')">Use this split</button>
+      </div>
+
+      <div class="settings-sec-lbl">Data</div>
+      <div class="srow">
+        <div><div class="srow-lbl">Export history</div><div class="srow-sub">Download sessions as CSV</div></div>
+        <button class="btn sm btn-o" style="margin:0" onclick="exportCSV()">Export</button>
+      </div>
+      <div class="srow" style="flex-direction:column;align-items:flex-start;gap:10px">
+        <div class="srow-lbl">Import from Strong</div>
+        <p style="font-size:var(--fs-sm);color:var(--ink3);margin:0">In Strong, go to Settings &rarr; Export, then upload the CSV here.</p>
+        <div class="import-zone" id="importZone" onclick="document.getElementById('importFile').click()">
+          <div class="import-zone-icon">&#128190;</div>
+          <div class="import-zone-title">Select Strong CSV file</div>
+          <div class="import-zone-sub">Supports Strong export format</div>
+        </div>
+        <input type="file" id="importFile" accept=".csv" style="display:none" onchange="importStrongCSV(this.files[0])">
+        <div id="importResult"></div>
+      </div>
+      <div class="srow">
+        <div><div class="srow-lbl">Clear all data</div><div class="srow-sub" style="color:var(--danger)">Cannot be undone</div></div>
+        <button class="btn sm danger-btn" style="margin:0" onclick="if(confirm('Clear all data?'))clearAll()">Clear</button>
+      </div>
+
     </div>
-    <div class="setting-row"><div><div class="setting-lbl">Experience level</div><div class="setting-sub" id="sLvlSub">&mdash;</div></div><select class="inp" style="width:auto" id="sLvl" onchange="updSet('level',this.value)"><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option></select></div>
-    <div class="setting-row"><div><div class="setting-lbl">Training days</div><div class="setting-sub">Per week</div></div><select class="inp" style="width:auto" id="sDays" onchange="updSet('days',parseInt(this.value))"><option value="3">3 days</option><option value="4">4 days</option><option value="5">5 days</option><option value="6">6 days</option></select></div>
-    <div class="setting-row"><div><div class="setting-lbl">Equipment</div></div><select class="inp" style="width:auto" id="sEquip" onchange="updSet('equipment',this.value)"><option value="full">Full gym</option><option value="home">Home gym</option><option value="bodyweight">Bodyweight</option></select></div>
-  </div>
-  <div class="sec-lbl" style="margin-top:6px">Recommended split</div>
-  <div class="card accent" id="splitRec"></div>
-  <div class="sec-lbl" style="margin-top:6px">Training splits</div>
-  <div class="split-card">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px"><div class="split-name">Push / Pull / Legs</div><span class="badge bb">5&ndash;6 days</span></div>
-    <div class="split-desc">Highest frequency per muscle group. Ideal for intermediate to advanced lifters.</div>
-    <div class="day-row"><div class="day-lbl">Mon</div><div>Push A</div></div><div class="day-row"><div class="day-lbl">Tue</div><div>Pull A</div></div><div class="day-row"><div class="day-lbl">Wed</div><div>Legs A</div></div><div class="day-row"><div class="day-lbl">Thu</div><div>Push B</div></div><div class="day-row"><div class="day-lbl">Fri</div><div>Pull B</div></div><div class="day-row"><div class="day-lbl">Sat</div><div>Legs B</div></div><div class="day-row"><div class="day-lbl">Sun</div><div class="day-rest">Rest</div></div>
-    <button class="btn btn-o" onclick="DB.split='PPL';saveDB();toast('PPL activated')">Use this split</button>
-  </div>
-  <div class="split-card">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px"><div class="split-name">Upper / Lower</div><span class="badge bs">4 days</span></div>
-    <div class="split-desc">Each muscle hit twice per week with full recovery between sessions.</div>
-    <div class="day-row"><div class="day-lbl">Mon</div><div>Upper A</div></div><div class="day-row"><div class="day-lbl">Tue</div><div>Lower A</div></div><div class="day-row"><div class="day-lbl">Thu</div><div>Upper B</div></div><div class="day-row"><div class="day-lbl">Fri</div><div>Lower B</div></div><div class="day-row"><div class="day-lbl">Rest</div><div class="day-rest">Wed / Sat / Sun</div></div>
-    <button class="btn btn-o" onclick="DB.split='Upper/Lower';saveDB();toast('Upper/Lower activated')">Use this split</button>
-  </div>
-  <div class="split-card">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px"><div class="split-name">Full body (3-day)</div><span class="badge bn">3 days</span></div>
-    <div class="split-desc">Maximum frequency per session. Best for beginners or limited schedules.</div>
-    <div class="day-row"><div class="day-lbl">Mon</div><div>Full body A</div></div><div class="day-row"><div class="day-lbl">Wed</div><div>Full body B</div></div><div class="day-row"><div class="day-lbl">Fri</div><div>Full body C</div></div>
-    <button class="btn btn-o" onclick="DB.split='Full Body';saveDB();toast('Full Body activated')">Use this split</button>
-  </div>
-  <div class="sec-lbl" style="margin-top:6px">Data</div>
-  <div class="card" style="padding:0 18px">
-    <div class="setting-row"><div><div class="setting-lbl">Export history</div><div class="setting-sub">Download all sessions as CSV</div></div><button class="btn sm btn-o" onclick="exportCSV()">Export</button></div>
-    <div class="divider"></div>
-    <div class="sec-lbl">Import from Strong</div>
-    <p style="font-size:var(--fs-sm);color:var(--ink3);margin:0 0 14px">In Strong, go to Settings &rarr; Export, then upload the CSV here.</p>
-    <div class="import-zone" id="importZone" onclick="document.getElementById('importFile').click()">
-      <div class="import-zone-icon">&#128190;</div>
-      <div class="import-zone-title">Select Strong CSV file</div>
-      <div class="import-zone-sub">Supports Strong export format</div>
-    </div>
-    <input type="file" id="importFile" accept=".csv" style="display:none" onchange="importStrongCSV(this.files[0])">
-    <div id="importResult"></div>
-    <div class="setting-row" style="margin-top:10px"><div><div class="setting-lbl">Clear all data</div><div class="setting-sub" style="color:var(--danger)">Cannot be undone</div></div><button class="btn sm danger-btn" style="margin:0" onclick="if(confirm('Clear all data?'))clearAll()">Clear</button></div>
   </div>
 </div>
-
 <!-- BOTTOM NAV (FIX 5: flush, FIX 4: gear stroke) -->
 <div class="bnav">
   <div class="nitem on" data-n="dash" onclick="sw('dash',this)" ontouchstart="">
@@ -936,7 +1006,7 @@ input[type=number]{-moz-appearance:textfield}
     <svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
     <span class="nlbl">Progress</span>
   </div>
-  <div class="nitem" data-n="settings" onclick="sw('settings',this)" ontouchstart="">
+  <div class="nitem" data-n="settings" onclick="openSettings()" ontouchstart="">
     <svg class="nico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="3"/>
       <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -1049,7 +1119,6 @@ function sw(name,el){
   if(name==='history')setTimeout(renderHistory,0);
   if(name==='library')renderLib();
   if(name==='body'){renderMeasHist();renderBodyChart();}
-  if(name==='settings')setTimeout(renderSettings,0);
   if(name==='coach')renderCoach();
   if(name==='templates')setTimeout(renderTemplatesTab,0);
   if(name==='log')buildTplList();
@@ -1546,6 +1615,9 @@ function calcRM(){var kg=parseFloat(document.getElementById('rmKg').value),reps=
 // ============================================================
 // SETTINGS
 // ============================================================
+function openSettings(){renderSettings();document.getElementById('settingsOverlay').classList.add('open');document.body.style.overflow='hidden';}
+function closeSettings(){document.getElementById('settingsOverlay').classList.remove('open');document.body.style.overflow='';}
+function closeSettingsIfBg(e){if(e.target===document.getElementById('settingsOverlay'))closeSettings();}
 function renderSettings(){
   var p=DB.profile;
   document.getElementById('sLvlSub').textContent=p.level;
@@ -1555,14 +1627,21 @@ function renderSettings(){
   var gs=document.getElementById('goalSelect');if(gs)gs.value=DB.goal||'hypertrophy';
   var rec={beginner:'Full Body',intermediate:p.days>=5?'PPL':'Upper/Lower',advanced:'PPL'}[p.level]||'PPL';
   var desc={PPL:'PPL gives you maximum weekly muscle frequency for your experience and schedule.','Upper/Lower':'Upper/Lower hits each muscle twice per week &mdash; ideal balance for 4 days.','Full Body':'Full body 3&times; per week maximises stimulus frequency at your level.'}[rec];
-  document.getElementById('splitRec').innerHTML='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px"><span style="font-size:var(--fs-lg);font-weight:700;color:var(--ink)">'+rec+' recommended</span><span class="badge bb">For you</span></div><div style="font-size:var(--fs-sm);color:var(--ink2);line-height:1.6">'+desc+'</div>';
+  document.getElementById('splitRec').innerHTML='<strong style="color:var(--ink)">'+rec+' recommended</strong> &mdash; <span style="color:var(--ink2)">'+desc+'</span>';
+  updateDarkBtn();
   renderSchedulePlanner();
 }
 function updSet(key,val){DB.profile[key]=val;saveDB();renderSettings();toast('Settings updated');}
+function updateDarkBtn(){
+  var dark=document.documentElement.getAttribute('data-theme')==='dark';
+  var btn=document.getElementById('darkBtn');
+  if(btn)btn.innerHTML=dark?'&#9728;&#65039; Light':'&#127769; Dark';
+}
 function toggleDark(){
-  var el=document.documentElement,next=el.getAttribute('data-theme')==='dark'?'light':'dark';
-  el.setAttribute('data-theme',next);localStorage.setItem('hc_theme',next);
-  var btn=document.getElementById('darkBtn');if(btn)btn.textContent=next==='dark'?'\u2600\uFE0F Light':'\uD83C\uDF19 Dark';
+  var dark=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',dark?'light':'dark');
+  localStorage.setItem('hc_theme',dark?'light':'dark');
+  updateDarkBtn();
 }
 
 // ============================================================
@@ -1601,10 +1680,10 @@ function importStrongCSV(file){
 // ============================================================
 // INIT
 // ============================================================
-function initApp(){renderDash();renderSettings();renderTemplatesTab();buildTplList();}
+function initApp(){renderDash();renderTemplatesTab();buildTplList();}
 
 // Apply saved theme immediately
-(function(){try{var t=localStorage.getItem('hc_theme');if(t==='dark'){document.documentElement.setAttribute('data-theme','dark');var btn=document.getElementById('darkBtn');if(btn)btn.textContent='\u2600\uFE0F Light';}}catch(e){}})();
+(function(){try{var t=localStorage.getItem('hc_theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
 
 loadDB();
 if(localStorage.getItem('hc_v5')){
